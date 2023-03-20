@@ -15,8 +15,8 @@ export default function App({ Component, pageProps }) {
 
   useEffect(() => {
     (async () => {
-      const dataPromise = fetch("https://e85a5072.cauldron.pages.dev/bare.sqlite3").then(res => res.arrayBuffer());
-      const worker = new Worker("https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/worker.sql-wasm.js");
+      const dataPromise = fetch("/bare.sqlite3").then(res => res.arrayBuffer());
+      const worker = new Worker("/worker.sql-wasm.js");
 
       worker.onerror = worker_onerror;
 

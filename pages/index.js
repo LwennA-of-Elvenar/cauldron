@@ -78,7 +78,7 @@ const Home = ({db}) => {
     if (savedDiplomas) setDiplomas(savedDiplomas);
 
     const savedDesiredEffects = readDesiredEffects();
-    if (saveDesiredEffects) setDesiredEffects(savedDesiredEffects);
+    if (savedDesiredEffects) setDesiredEffects(savedDesiredEffects);
 
     const savedPotion = readPotion();
     if (savedPotion) setPotionRaw(savedPotion);
@@ -106,7 +106,7 @@ const Home = ({db}) => {
           <div>
             <h2>Initializing application</h2>
             <p>
-              Please wait while we fire up the witch's cauldron...
+              Please wait while we fire up the witch&apos;s cauldron...
             </p>
           </div>
         )}
