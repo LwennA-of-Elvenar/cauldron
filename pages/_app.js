@@ -1,41 +1,50 @@
-import { useState, useEffect } from "react";
-import '@/styles/globals.css'
+import { useState, useEffect } from 'react';
+import '../styles/globals.css';
 
-export default function App({ Component, pageProps }) {
+const App = ({ Component, pageProps }) => {
   const [worker, setWorker] = useState(null);
   const [error, setError] = useState(null);
+
+  /*
   const clearError = () => {
     setError(null);
-  }
+  };
+  */
 
-  const worker_onerror = (e) => {
-    console.log(e);
+  const worker_onerror = e => {
+    console.log(e); // eslint-disable-line no-console
     setError(e.message);
-  }
+  };
 
   useEffect(() => {
     (async () => {
-      const dataPromise = fetch("/bare.sqlite3").then(res => res.arrayBuffer());
-      const worker = new Worker("/worker.sql-wasm.js");
+      const dataPromise = fetch('/bare.sqlite3').then(res => res.arrayBuffer());
+      const newWorker = new Worker('/worker.sql-wasm.js');
 
-      worker.onerror = worker_onerror;
+      newWorker.onerror = worker_onerror;
 
-      worker.onmessage = (e) => {
-        setWorker(worker);
-      }
+      newWorker.onmessage = () => {
+        setWorker(newWorker);
+      };
 
       const buffer = await Promise.resolve(dataPromise);
       const dbArray = new Uint8Array(buffer);
 
-      worker.postMessage({action: 'open', buffer: dbArray});
+      newWorker.postMessage({ action: 'open', buffer: dbArray });
     })();
-    
   }, []);
 
   if (error) return <pre>{error.toString()}</pre>;
-  else return <Component {...pageProps} db={{
-    loaded: worker ? true : false,
-    worker: worker,
-    setError: setError
-  }} />
-}
+  return (
+    <Component
+      {...pageProps}
+      db={{
+        loaded: !!worker,
+        worker,
+        setError,
+      }}
+    />
+  );
+};
+
+export default App;
