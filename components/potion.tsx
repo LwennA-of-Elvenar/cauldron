@@ -1,11 +1,21 @@
-import PropTypes from 'prop-types';
+import { Dispatch, SetStateAction } from 'react';
+
+type SinglePotionIngredientType = {
+  ingredientID: number;
+  amount: number;
+  setAmount: (amount: string) => void;
+};
+
+type SinglePotionIngredientProps = {
+  editable: boolean;
+} & SinglePotionIngredientType;
 
 const SinglePotionIngredient = ({
   editable,
   ingredientID,
   amount,
   setAmount,
-}) => (
+}: SinglePotionIngredientProps) => (
   <>
     <input
       id={`potionIngredient${ingredientID.toString()}`}
@@ -26,18 +36,15 @@ const SinglePotionIngredient = ({
   </>
 );
 
-const SinglePotionIngredientProps = {
-  ingredientID: PropTypes.number,
-  amount: PropTypes.number,
-  setAmount: PropTypes.func,
+type PotionIngredientRowProps = {
+  editable: boolean;
+  elements: Array<SinglePotionIngredientType>;
 };
 
-SinglePotionIngredient.propTypes = {
-  editable: PropTypes.bool,
-  ...SinglePotionIngredientProps,
-};
-
-const PotionIngredientRow = ({ editable, elements }) => (
+const PotionIngredientRow = ({
+  editable,
+  elements,
+}: PotionIngredientRowProps) => (
   <div>
     {elements.map((element, index) => (
       <SinglePotionIngredient key={index} editable={editable} {...element} />
@@ -45,31 +52,42 @@ const PotionIngredientRow = ({ editable, elements }) => (
   </div>
 );
 
-PotionIngredientRow.propTypes = {
-  editable: PropTypes.bool,
-  elements: PropTypes.arrayOf(PropTypes.shape(SinglePotionIngredientProps)),
+export type PotionType = {
+  [x: number]: number;
 };
 
-const Potion = ({ editable, potion, setPotion }) => {
-  const rows = {};
+type PotionProps = {
+  editable: boolean;
+  potion: PotionType;
+  setPotion: Dispatch<SetStateAction<PotionType>>;
+};
 
-  const setAmount = ingredientID => {
-    const setAmountForIngredient = amount => {
-      if (!/^\d+$/.test(amount)) return;
+type RowType = {
+  [x: number]: Array<SinglePotionIngredientType>;
+};
+
+const Potion = ({ editable, potion, setPotion }: PotionProps) => {
+  const rows: RowType = {};
+
+  const setAmount = (ingredientID: number) => {
+    const setAmountForIngredient = (amount_str: string) => {
+      if (!/^\d+$/.test(amount_str)) return;
+      const amount = parseInt(amount_str);
       if (amount > 25) return;
       setPotion(config => ({
         ...config,
-        [ingredientID]: parseInt(amount, 10),
+        [ingredientID]: amount,
       }));
     };
     return setAmountForIngredient;
   };
 
   Object.entries(potion).forEach(entry => {
-    const [ingredientID, amount] = entry;
+    const ingredientID = parseInt(entry[0]);
+    const amount = entry[1];
     const row = Math.trunc((ingredientID - 1) / 4);
     const element = {
-      ingredientID: parseInt(ingredientID, 10),
+      ingredientID: ingredientID,
       amount,
       setAmount: setAmount(ingredientID),
     };
@@ -91,7 +109,7 @@ const Potion = ({ editable, potion, setPotion }) => {
           <PotionIngredientRow
             key={index}
             editable={editable}
-            elements={rows[rowNumber]}
+            elements={rows[parseInt(rowNumber)]}
           />
         ))}
       </div>
@@ -109,12 +127,6 @@ const Potion = ({ editable, potion, setPotion }) => {
       `}</style>
     </>
   );
-};
-
-Potion.propTypes = {
-  editable: PropTypes.bool,
-  potion: PropTypes.object, // eslint-disable-line react/forbid-prop-types
-  setPotion: PropTypes.func,
 };
 
 export default Potion;

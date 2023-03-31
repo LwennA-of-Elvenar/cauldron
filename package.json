@@ -1,5 +1,5 @@
 {
-  "name": "cauldron",
+  "name": "cauldron-ts",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,17 +9,22 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/node": "18.15.11",
+    "@types/react": "18.0.31",
+    "@types/react-dom": "18.0.11",
     "next": "13.2.4",
-    "prop-types": "^15.8.1",
     "react": "18.2.0",
     "react-cookie": "^4.1.1",
     "react-dom": "18.2.0",
-    "sql.js": "^1.8.0"
+    "typescript": "5.0.3"
   },
   "devDependencies": {
-    "@ijsto/eslint-config": "^4.4.3",
-    "eslint": "^8.36.0",
-    "eslint-config-next": "^13.2.4",
-    "prettier": "^2.8.6"
+    "@ijsto/eslint-config": "^4.5.3",
+    "@types/sql.js": "^1.4.4",
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@typescript-eslint/parser": "^5.57.0",
+    "eslint": "^8.37.0",
+    "eslint-config-next": "13.2.4",
+    "prettier": "^2.8.7"
   }
 }

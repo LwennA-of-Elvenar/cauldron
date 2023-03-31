@@ -1,54 +1,79 @@
-const simpleLineFormatter = (key, value) => {
-    return `(${key}, ${value})`
-}
+import { DiamondIngredientConfigType } from '@/components/diamond_ingredients';
+import { PotionType } from '@/components/potion';
+import { DesiredEffectsType } from '@/components/desired_effects';
 
-const boolLineFormatter = (key, value) => {
-    return `(${key}, ${value? 1 : 0})`
-}
+type AllowedObjectValueTypes = string | number | boolean;
 
-const objectToTupleString = (obj, lineFormatter) => {
-    let result = [];
-    for (const [key, value] of Object.entries(obj)) {
-        result.push(lineFormatter(key, value));
-    }
-    return result.join(",");
-}
+type ObjectType<T extends AllowedObjectValueTypes> = {
+  [x: string]: T;
+};
 
-export const insertPotionIntoDB = (potion) => {
-    const dataTuples = objectToTupleString(potion, simpleLineFormatter);
-    const statement = `
+type LineFormatter<T extends AllowedObjectValueTypes> = (
+  key: string,
+  value: T
+) => string;
+
+const simpleLineFormatter = (key: string, value: string | number) => {
+  return `(${key}, ${value})`;
+};
+
+const boolLineFormatter = (key: string, value: boolean) => {
+  return `(${key}, ${value ? 1 : 0})`;
+};
+
+const objectToTupleString = <T extends AllowedObjectValueTypes>(
+  obj: ObjectType<T>,
+  lineFormatter: LineFormatter<T>
+) => {
+  const result = [];
+  for (const [key, value] of Object.entries(obj)) {
+    result.push(lineFormatter(key, value));
+  }
+  return result.join(',');
+};
+
+export const insertPotionIntoDB = (potion: PotionType) => {
+  const dataTuples = objectToTupleString(potion, simpleLineFormatter);
+  const statement = `
         DELETE FROM potion;
         INSERT INTO potion (ingredient, amount)
         VALUES
         ${dataTuples};
-    `
-    return statement;
-}
+    `;
+  return statement;
+};
 
-export const insertDiamondIngredientConfigIntoDB = (diamondIngredientConfig) => {
-    const dataTuples = objectToTupleString(diamondIngredientConfig, boolLineFormatter);
-    const statement = `
+export const insertDiamondIngredientConfigIntoDB = (
+  diamondIngredientConfig: DiamondIngredientConfigType
+) => {
+  const dataTuples = objectToTupleString(
+    diamondIngredientConfig,
+    boolLineFormatter
+  );
+  const statement = `
         DELETE FROM diamond_ingredients;
         INSERT INTO diamond_ingredients (ingredient, diamond)
         VALUES
         ${dataTuples};
-    `
-    return statement;
-}
+    `;
+  return statement;
+};
 
-export const insertDesiredEffectsIntoDB = (desiredEffects) => {
-    const dataTuples = objectToTupleString(desiredEffects, simpleLineFormatter);
-    const statement = `
+export const insertDesiredEffectsIntoDB = (
+  desiredEffects: DesiredEffectsType
+) => {
+  const dataTuples = objectToTupleString(desiredEffects, simpleLineFormatter);
+  const statement = `
         DELETE FROM desired_effects;
         INSERT INTO desired_effects (effect, weight)
         VALUES
         ${dataTuples};
-    `
-    return statement;
-}
+    `;
+  return statement;
+};
 
-export const calculateChancesQuery = (diplomas) => {
-    const statement = `
+export const calculateChancesQuery = (diplomas: number) => {
+  const statement = `
         WITH adjusted_experiment AS
         (
             SELECT
@@ -168,12 +193,16 @@ export const calculateChancesQuery = (diplomas) => {
         )
         SELECT effect, point_cost, diamond_cost, single_probability FROM chances
         ORDER BY single_probability desc, effect;
-    `
-    return statement;
-}
+    `;
+  return statement;
+};
 
-export const optimizePotionQuery = (diplomas, witchPointLimit, diamondsLimit) => {
-    const statement = `
+export const optimizePotionQuery = (
+  diplomas: number,
+  witchPointLimit: number,
+  diamondsLimit: number
+) => {
+  const statement = `
         WITH adjusted_experiment AS
         (
             SELECT
@@ -335,6 +364,6 @@ export const optimizePotionQuery = (diplomas, witchPointLimit, diamondsLimit) =>
         ON b.sample = e.sample
         ORDER BY b.diamond_cost, b.point_cost, b.sample, e.ingredient;
         
-    `
-    return statement;
-}
+    `;
+  return statement;
+};

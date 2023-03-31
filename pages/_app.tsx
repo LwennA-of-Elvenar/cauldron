@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react';
-import '../styles/globals.css';
+import type { AppProps } from 'next/app';
+import '@/styles/globals.css';
 
-const App = ({ Component, pageProps }) => {
-  const [worker, setWorker] = useState(null);
-  const [error, setError] = useState(null);
+export type DBType = {
+  loaded: boolean;
+  worker: Worker;
+  setError: (msg: null | string) => void;
+};
+
+const App = ({ Component, pageProps }: AppProps) => {
+  const [worker, setWorker] = useState<null | Worker>(null);
+  const [error, setError] = useState<null | string>(null);
 
   /*
   const clearError = () => {
@@ -11,7 +18,7 @@ const App = ({ Component, pageProps }) => {
   };
   */
 
-  const worker_onerror = e => {
+  const worker_onerror = (e: ErrorEvent) => {
     console.log(e); // eslint-disable-line no-console
     setError(e.message);
   };

@@ -1,22 +1,37 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, SetStateAction, Dispatch } from 'react';
 import {
   readCostLimits,
   saveCostLimits,
   setAndSaveStateWrapper,
-} from '../engine/cookie';
+} from '@/engine/cookie';
+
+export type EffectiveCostLimitsType = {
+  witchPoints: number;
+  diamonds: number;
+};
+
+export type CostLimitsType = {
+  unlimited: boolean;
+} & EffectiveCostLimitsType;
+
+type CostLimitsProps = {
+  editable: boolean;
+  effectiveCostLimits: EffectiveCostLimitsType;
+  setEffectiveCostLimits: Dispatch<SetStateAction<EffectiveCostLimitsType>>;
+};
 
 const CostLimits = ({
   editable,
   effectiveCostLimits,
   setEffectiveCostLimits,
-}) => {
+}: CostLimitsProps) => {
   const defaultCostLimits = {
     unlimited: false,
-    witchPoints: '1000',
-    diamonds: '0',
+    witchPoints: 1000,
+    diamonds: 0,
   };
 
-  const [costLimit, setCostLimit] = useState(defaultCostLimits);
+  const [costLimit, setCostLimit] = useState<CostLimitsType>(defaultCostLimits);
 
   useEffect(() => {
     const savedCostLimit = readCostLimits();
@@ -48,9 +63,9 @@ const CostLimits = ({
     setEffectiveCostLimits,
   ]);
 
-  const setUnlimitedState = unlimitedState => {
+  const setUnlimitedState = (unlimitedState: boolean) => {
     setAndSaveStateWrapper(
-      currentLimit => ({
+      (currentLimit: CostLimitsType) => ({
         ...currentLimit,
         unlimited: unlimitedState,
       }),
@@ -60,14 +75,14 @@ const CostLimits = ({
     );
   };
 
-  const setWitchPointLimit = witchPoints => {
+  const setWitchPointLimit = (witchPoints: string) => {
     if (costLimit.unlimited) return;
     if (!/^\d*$/.test(witchPoints)) return;
 
     setAndSaveStateWrapper(
-      currentLimit => ({
+      (currentLimit: CostLimitsType) => ({
         ...currentLimit,
-        witchPoints,
+        witchPoints: parseInt(witchPoints),
       }),
       costLimit,
       setCostLimit,
@@ -75,16 +90,16 @@ const CostLimits = ({
     );
   };
 
-  const setDiamondLimit = diamonds => {
+  const setDiamondLimit = (diamonds: string) => {
     if (costLimit.unlimited) return;
     if (!/^\d*$/.test(diamonds)) return;
 
     if (costLimit.unlimited) return;
 
     setAndSaveStateWrapper(
-      currentLimit => ({
+      (currentLimit: CostLimitsType) => ({
         ...currentLimit,
-        diamonds,
+        diamonds: parseInt(diamonds),
       }),
       costLimit,
       setCostLimit,

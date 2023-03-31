@@ -1,8 +1,20 @@
-import { useEffect } from 'react';
-import { effects } from '../engine/mappings';
-import { saveDesiredEffects, setAndSaveStateWrapper } from '../engine/cookie';
+import { Dispatch, SetStateAction, useEffect } from 'react';
+import { effects } from '@/engine/mappings';
+import { saveDesiredEffects, setAndSaveStateWrapper } from '@/engine/cookie';
 
-const DesiredEffect = ({ editable, effect, weight, setWeight }) => (
+type DesiredEffectProps = {
+  editable: boolean;
+  effect: number;
+  weight: number;
+  setWeight: (newWeight: string) => void;
+};
+
+const DesiredEffect = ({
+  editable,
+  effect,
+  weight,
+  setWeight,
+}: DesiredEffectProps) => (
   <>
     <div className="row">
       <span className="effect">{effects[effect]}: </span>
@@ -36,13 +48,25 @@ const DesiredEffect = ({ editable, effect, weight, setWeight }) => (
   </>
 );
 
+export type DesiredEffectsType = {
+  [x: number]: number;
+};
+
+type DesiredEffectsProps = {
+  editable: boolean;
+  cookiesLoaded: boolean;
+  diplomas: number;
+  desiredEffects: DesiredEffectsType;
+  setDesiredEffects: Dispatch<SetStateAction<DesiredEffectsType>>;
+};
+
 const DesiredEffects = ({
   editable,
   cookiesLoaded,
   diplomas,
   desiredEffects,
   setDesiredEffects,
-}) => {
+}: DesiredEffectsProps) => {
   const effectiveDesiredEffects = [];
   for (let i = 1; i <= diplomas; i += 1) {
     effectiveDesiredEffects.push({
@@ -51,25 +75,27 @@ const DesiredEffects = ({
     });
   }
 
-  const setWeight = effect => {
-    const setWeightForEffect = weight => {
-      if (!/^\d+(?:\.\d+)?$/.test(weight)) return;
+  const setWeight = (effect: number) => {
+    const setWeightForEffect = (weight_str: string) => {
+      if (!/^\d+(?:\.\d+)?$/.test(weight_str)) return;
+      const weight = parseFloat(weight_str);
       if (weight > 1) return;
       setAndSaveStateWrapper(
-        currentEffects => {
-          const newEffects = {};
+        (currentEffects: DesiredEffectsType) => {
+          const newEffects: DesiredEffectsType = {};
           Object.entries(currentEffects).forEach(entry => {
-            const [currentEffect, currentWeight] = entry;
+            const currentEffect = parseInt(entry[0]);
+            const currentWeight = entry[1];
             if (
               currentWeight !== 0.0 &&
               currentEffect !== effect &&
-              parseInt(currentEffect, 10) <= parseInt(diplomas, 10)
+              currentEffect <= diplomas
             ) {
               newEffects[currentEffect] = currentWeight;
             }
           });
           if (weight !== 0.0) {
-            newEffects[effect] = parseFloat(weight);
+            newEffects[effect] = weight;
           }
           return newEffects;
         },
@@ -82,7 +108,7 @@ const DesiredEffects = ({
   };
 
   useEffect(() => {
-    if (cookiesLoaded) setWeight(0)(0.0);
+    if (cookiesLoaded) setWeight(0)('0.0');
   }, [diplomas]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const validConfig =

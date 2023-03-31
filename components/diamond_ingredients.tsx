@@ -1,14 +1,20 @@
-import PropTypes from 'prop-types';
-import { saveDiamondIngredientsConfig } from '../engine/cookie';
+import { Dispatch, SetStateAction } from 'react';
+import { saveDiamondIngredientsConfig } from '@/engine/cookie';
+
+type ElementProps = {
+  ingredientID: number;
+  requiresDiamonds: boolean;
+  setRequiresDiamonds: (requiresDiamonds: boolean) => void;
+};
 
 const SingleDiamondIngredient = ({
   editable,
   ingredientID,
   requiresDiamonds,
   setRequiresDiamonds,
-}) => (
+}: { editable: boolean } & ElementProps) => (
   <input
-    id={ingredientID}
+    id={ingredientID.toString()}
     disabled={!editable}
     type="checkbox"
     checked={requiresDiamonds}
@@ -18,18 +24,15 @@ const SingleDiamondIngredient = ({
   />
 );
 
-const SingleIngredientProps = {
-  ingredientID: PropTypes.number,
-  requiresDiamonds: PropTypes.bool,
-  setRequiresDiamonds: PropTypes.func,
+type DiamondIngredientRowProps = {
+  editable: boolean;
+  elements: Array<ElementProps>;
 };
 
-SingleDiamondIngredient.propTypes = {
-  editable: PropTypes.bool,
-  ...SingleIngredientProps,
-};
-
-const DiamondIngredientRow = ({ editable, elements }) => (
+const DiamondIngredientRow = ({
+  editable,
+  elements,
+}: DiamondIngredientRowProps) => (
   <div>
     {elements.map((element, index) => (
       <SingleDiamondIngredient key={index} editable={editable} {...element} />
@@ -37,21 +40,32 @@ const DiamondIngredientRow = ({ editable, elements }) => (
   </div>
 );
 
-DiamondIngredientRow.propTypes = {
-  editable: PropTypes.bool,
-  elements: PropTypes.arrayOf(PropTypes.shape(SingleIngredientProps)),
+export type DiamondIngredientConfigType = {
+  [x: number]: boolean;
+};
+
+type DiamondIngredientConfigProps = {
+  editable: boolean;
+  diamondIngredientConfig: DiamondIngredientConfigType;
+  setDiamondIngredientConfig: Dispatch<
+    SetStateAction<DiamondIngredientConfigType>
+  >;
+};
+
+type RowType = {
+  [x: number]: Array<ElementProps>;
 };
 
 const DiamondIngredientConfig = ({
   editable,
   diamondIngredientConfig,
   setDiamondIngredientConfig,
-}) => {
-  const rows = {};
+}: DiamondIngredientConfigProps) => {
+  const rows: RowType = {};
 
-  const setRequiresDiamonds = ingredientID => {
-    const setRequiresDiamondsForIngredient = requiresDiamonds => {
-      const getNewConfig = config => ({
+  const setRequiresDiamonds = (ingredientID: number) => {
+    const setRequiresDiamondsForIngredient = (requiresDiamonds: boolean) => {
+      const getNewConfig = (config: DiamondIngredientConfigType) => ({
         ...config,
         [ingredientID]: requiresDiamonds,
       });
@@ -62,10 +76,11 @@ const DiamondIngredientConfig = ({
   };
 
   Object.entries(diamondIngredientConfig).forEach(entry => {
-    const [ingredientID, requiresDiamonds] = entry;
+    const ingredientID = parseInt(entry[0]);
+    const requiresDiamonds = entry[1];
     const row = Math.trunc((ingredientID - 1) / 4);
     const element = {
-      ingredientID: parseInt(ingredientID, 10),
+      ingredientID: ingredientID,
       requiresDiamonds,
       setRequiresDiamonds: setRequiresDiamonds(ingredientID),
     };
@@ -90,7 +105,7 @@ const DiamondIngredientConfig = ({
           <DiamondIngredientRow
             key={index}
             editable={editable}
-            elements={rows[rowNumber]}
+            elements={rows[parseInt(rowNumber)]}
           />
         ))}
       </div>
@@ -108,12 +123,6 @@ const DiamondIngredientConfig = ({
       `}</style>
     </>
   );
-};
-
-DiamondIngredientConfig.propTypes = {
-  editable: PropTypes.bool,
-  diamondIngredientConfig: PropTypes.object, // eslint-disable-line react/forbid-prop-types
-  setDiamondIngredientConfig: PropTypes.func,
 };
 
 export default DiamondIngredientConfig;
