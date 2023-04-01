@@ -1,12 +1,24 @@
 import Head from 'next/head';
-import { useEffect, useState, useRef } from 'react';
-import DiamondIngredientConfig from '../components/diamond_ingredients';
-import CostLimits from '../components/cost_limits';
-import Diplomas from '../components/diplomas';
-import DesiredEffects from '../components/desired_effects';
-import Potion from '../components/potion';
-import PotionStats from '../components/potion_stats';
-import { calculateChances, optimizePotion } from '../engine/core';
+import {
+  useEffect,
+  useState,
+  useRef,
+  SetStateAction,
+  Dispatch,
+  MutableRefObject,
+} from 'react';
+import { DBType } from './_app';
+import DiamondIngredientConfig, {
+  DiamondIngredientConfigType,
+} from '@/components/diamond_ingredients';
+import CostLimits, { EffectiveCostLimitsType } from '@/components/cost_limits';
+import Diplomas from '@/components/diplomas';
+import DesiredEffects, {
+  DesiredEffectsType,
+} from '@/components/desired_effects';
+import Potion, { PotionType } from '@/components/potion';
+import PotionStats, { PotionStatsType } from '@/components/potion_stats';
+import { calculateChances, optimizePotion } from '@/engine/core';
 import {
   readDesiredEffects,
   readDiamondIngredientsConfig,
@@ -14,11 +26,32 @@ import {
   readPotion,
   setAndSaveStateWrapper,
   savePotion,
-} from '../engine/cookie';
+} from '@/engine/cookie';
 
-const Home = ({ db }) => {
-  const defaultDiamondIngredientConfig = {};
-  const defaultPotion = {};
+type HomeProps = {
+  db: DBType;
+};
+
+export type EngineStateType = {
+  busy: boolean;
+  setBusy: Dispatch<SetStateAction<boolean>>;
+  cancelFlag: MutableRefObject<boolean>;
+  setCancelling: Dispatch<SetStateAction<boolean>>;
+  setRecalculationRequired: Dispatch<SetStateAction<boolean>>;
+  setWarning: Dispatch<SetStateAction<null | string>>;
+  diamondIngredientConfig: DiamondIngredientConfigType;
+  potion: PotionType;
+  setPotion: Dispatch<SetStateAction<PotionType>>;
+  setPotionStats: Dispatch<SetStateAction<PotionStatsType>>;
+  costLimit: EffectiveCostLimitsType;
+  diplomas: number;
+  desiredEffects: DesiredEffectsType;
+  db: DBType;
+};
+
+const Home = ({ db }: HomeProps) => {
+  const defaultDiamondIngredientConfig: DiamondIngredientConfigType = {};
+  const defaultPotion: PotionType = {};
   for (let i = 1; i <= 12; i += 1) {
     defaultDiamondIngredientConfig[i] = false;
     defaultPotion[i] = 0;
@@ -27,7 +60,7 @@ const Home = ({ db }) => {
     witchPoints: 0,
     diamonds: 0,
   };
-  const defaultPotionStats = {
+  const defaultPotionStats: PotionStatsType = {
     witchPoints: 0,
     diamonds: 0,
     effects: [],
@@ -40,10 +73,10 @@ const Home = ({ db }) => {
   const [costLimit, setCostLimit] = useState(defaultCostLimit);
   const [potionStats, setPotionStats] = useState(defaultPotionStats);
   const [diplomas, setDiplomas] = useState(1);
-  const [desiredEffects, setDesiredEffects] = useState({});
+  const [desiredEffects, setDesiredEffects] = useState<DesiredEffectsType>({});
 
   const [busy, setBusy] = useState(false);
-  const [warning, setWarning] = useState(null);
+  const [warning, setWarning] = useState<null | string>(null);
   const [recalculationRequired, setRecalculationRequired] = useState(true);
   const [cookiesLoaded, setCookiesLoaded] = useState(false);
   const [cancelling, setCancelling] = useState(false);
@@ -51,11 +84,11 @@ const Home = ({ db }) => {
 
   const editable = db.loaded && cookiesLoaded && !busy;
 
-  const setPotion = setStateFunc => {
+  const setPotion = (setStateFunc: SetStateAction<PotionType>) => {
     setAndSaveStateWrapper(setStateFunc, potion, setPotionRaw, savePotion);
   };
 
-  const engineState = {
+  const engineState: EngineStateType = {
     busy,
     setBusy,
     cancelFlag,

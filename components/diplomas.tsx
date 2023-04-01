@@ -1,8 +1,15 @@
-import { saveDiplomas } from '../engine/cookie';
+import { saveDiplomas } from '@/engine/cookie';
 
-const Diplomas = ({ editable, diplomas, setDiplomas }) => {
-  const verifyAndSetDiplomas = dipl => {
-    if (!/^\d+$/.test(dipl)) return;
+type DiplomasProps = {
+  editable: boolean;
+  diplomas: number;
+  setDiplomas: (diplomas: number) => void;
+};
+
+const Diplomas = ({ editable, diplomas, setDiplomas }: DiplomasProps) => {
+  const verifyAndSetDiplomas = (dipl_str: string) => {
+    if (!/^\d+$/.test(dipl_str)) return;
+    const dipl = parseInt(dipl_str);
     if (dipl > 20) return;
     if (dipl < 1) return;
     setDiplomas(dipl);

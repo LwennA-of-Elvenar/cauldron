@@ -1,4 +1,8 @@
-export const effects = {
+type EffectsType = {
+  [x: number]: string;
+};
+
+export const effects: EffectsType = {
   1: 'Money',
   2: 'Supplies',
   3: 'Barracks Strength',

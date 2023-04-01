@@ -1,3 +1,4 @@
+import { QueryExecResult } from 'sql.js';
 import {
   insertPotionIntoDB,
   insertDiamondIngredientConfigIntoDB,
@@ -5,33 +6,36 @@ import {
   insertDesiredEffectsIntoDB,
   optimizePotionQuery,
 } from './sql';
+import { EngineStateType } from '@/pages';
+import { PotionType } from '@/components/potion';
+import { PotionStatsType } from '@/components/potion_stats';
 
-const startOperation = engineState => {
+const startOperation = (engineState: EngineStateType) => {
   engineState.setCancelling(false);
   engineState.setBusy(true);
   engineState.setWarning('running...');
 };
 
-const finishOperation = engineState => {
+const finishOperation = (engineState: EngineStateType) => {
   engineState.setCancelling(false);
   engineState.setBusy(false);
   engineState.setWarning(null);
 };
 
-const cancelOperation = engineState => {
+const cancelOperation = (engineState: EngineStateType) => {
   engineState.setCancelling(false);
   engineState.setBusy(false);
   engineState.setWarning('Operation cancelled');
 };
 
-const failOperation = (engineState, message) => {
+const failOperation = (engineState: EngineStateType, message: string) => {
   engineState.setCancelling(false);
   engineState.setBusy(false);
   engineState.setWarning(message);
 };
 
-const formatPotionStats = result => {
-  const stats = {
+const formatPotionStats = (result: Array<QueryExecResult>) => {
+  const stats: PotionStatsType = {
     witchPoints: 0,
     diamonds: 0,
     effects: [],
@@ -39,22 +43,22 @@ const formatPotionStats = result => {
   if (result.length < 1) return stats;
   const data = result[0].values;
 
-  stats.witchPoints = data[0][1]; // eslint-disable-line prefer-destructuring
-  stats.diamonds = data[0][2]; // eslint-disable-line prefer-destructuring
+  stats.witchPoints = data[0][1] as number;
+  stats.diamonds = data[0][2] as number;
   if (stats.witchPoints === 0 && stats.diamonds === 0) return stats;
   data.forEach(effect => {
     stats.effects.push({
-      effect: effect[0].toString(),
-      probability: `${(100 * effect[3]).toFixed(2)}%`,
+      effect: effect[0] as number,
+      probability: `${(100 * (effect[3] as number)).toFixed(2)}%`,
     });
   });
   return stats;
 };
 
 export const calculateChances = (
-  engineState,
-  insertStatement = null,
-  callAfter = null
+  engineState: EngineStateType,
+  insertStatement: null | string = null,
+  callAfter: null | (() => void) = null
 ) => {
   const { worker } = engineState.db;
   const effectiveInsertStatement =
@@ -85,20 +89,20 @@ export const calculateChances = (
   });
 };
 
-const convertPotion = results => {
+const convertPotion = (results: Array<QueryExecResult>) => {
   const failure = {
     outcome: 'failed',
-    potion: null,
+    newPotion: null,
   };
   if (results.length < 1) return failure;
   const data = results[0].values;
   const sample = data[0][0];
   const harmonic_mean = data[0][3];
   if (harmonic_mean === 0) return failure;
-  const potion = {};
+  const potion: PotionType = {};
   for (let i = 0; i < data.length; i += 1) {
     if (data[i][0] !== sample) break;
-    potion[data[i][4]] = data[i][5]; // eslint-disable-line prefer-destructuring
+    potion[data[i][4] as number] = data[i][5] as number;
   }
   return {
     outcome: sample === 0 ? 'same' : 'better',
@@ -106,7 +110,10 @@ const convertPotion = results => {
   };
 };
 
-export const optimizePotion = (engineState, continuation = false) => {
+export const optimizePotion = (
+  engineState: EngineStateType,
+  continuation = false
+) => {
   const { worker } = engineState.db;
   const insertStatement = continuation
     ? ''
@@ -128,7 +135,7 @@ export const optimizePotion = (engineState, continuation = false) => {
       return;
     }
     const { outcome, newPotion } = convertPotion(results);
-    if (outcome === 'failed') {
+    if (outcome === 'failed' || newPotion === null) {
       failOperation(
         engineState,
         "The witch's assistant was unable to find a potion matching all desired effects. Try to remove some desired effects, or increase the cost limit, or start with a potion that uses e.g. one of each ingredient."

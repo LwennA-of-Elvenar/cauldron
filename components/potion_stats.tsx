@@ -1,9 +1,14 @@
-import { effects } from '../engine/mappings';
+import { effects } from '@/engine/mappings';
 
-const ChanceLine = ({ effect, chance }) => (
+type ChanceLineProps = {
+  effect: number;
+  probability: string;
+};
+
+const ChanceLine = ({ effect, probability }: ChanceLineProps) => (
   <>
-    <div className={`row ${chance === '0.00%' ? 'zero' : ''}`}>
-      <span className="chance">{chance}</span>
+    <div className={`row ${probability === '0.00%' ? 'zero' : ''}`}>
+      <span className="chance">{probability}</span>
       <span className="effect">{effects[effect]}</span>
     </div>
     <style jsx>{`
@@ -26,7 +31,21 @@ const ChanceLine = ({ effect, chance }) => (
   </>
 );
 
-const PotionStats = ({ potionStats, recalculationRequired }) => {
+export type PotionStatsType = {
+  witchPoints: number;
+  diamonds: number;
+  effects: Array<ChanceLineProps>;
+};
+
+type PotionStatsProps = {
+  potionStats: PotionStatsType;
+  recalculationRequired: boolean;
+};
+
+const PotionStats = ({
+  potionStats,
+  recalculationRequired,
+}: PotionStatsProps) => {
   if (potionStats.witchPoints === 0 && potionStats.diamonds === 0) {
     return null;
   }
@@ -40,7 +59,7 @@ const PotionStats = ({ potionStats, recalculationRequired }) => {
           <ChanceLine
             key={index}
             effect={effect.effect}
-            chance={effect.probability}
+            probability={effect.probability}
           />
         ))}
       </div>
