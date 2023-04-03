@@ -1,9 +1,15 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState, useEffect } from 'react';
+import {
+  parseInteger,
+  parseAndSetValues,
+  isEquivalent,
+  disallowNonDigits,
+} from '@/engine/input_validation';
 
 type SinglePotionIngredientType = {
   ingredientID: number;
   amount: number;
-  setAmount: (amount: string) => void;
+  setAmount: (amount: number) => void;
 };
 
 type SinglePotionIngredientProps = {
@@ -15,26 +21,56 @@ const SinglePotionIngredient = ({
   ingredientID,
   amount,
   setAmount,
-}: SinglePotionIngredientProps) => (
-  <>
-    <input
-      id={`potionIngredient${ingredientID.toString()}`}
-      disabled={!editable}
-      type="number"
-      min="0"
-      max="25"
-      value={amount}
-      onChange={e => {
-        setAmount(e.target.value);
-      }}
-    />
-    <style jsx>{`
-      input {
-        width: 3em;
-      }
-    `}</style>
-  </>
-);
+}: SinglePotionIngredientProps) => {
+  const [internalAmount, setInternalAmount] = useState<string>(
+    amount.toString()
+  );
+
+  useEffect(() => {
+    if (!isEquivalent(amount, internalAmount)) {
+      setInternalAmount(amount.toString());
+    }
+  }, [amount]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const isValidAmount = (amount: number) => {
+    if (amount < 0) return false;
+    if (amount > 25) return false;
+    return true;
+  };
+
+  return (
+    <>
+      <input
+        id={`potionIngredient${ingredientID.toString()}`}
+        disabled={!editable}
+        type="number"
+        min="0"
+        max="25"
+        value={internalAmount}
+        onBeforeInput={disallowNonDigits}
+        onChange={e => {
+          parseAndSetValues(
+            e.target.value,
+            parseInteger,
+            isValidAmount,
+            setInternalAmount,
+            setAmount
+          );
+        }}
+        onBlur={e => {
+          if (e.target.value == '') {
+            setInternalAmount('0');
+          }
+        }}
+      />
+      <style jsx>{`
+        input {
+          width: 3em;
+        }
+      `}</style>
+    </>
+  );
+};
 
 type PotionIngredientRowProps = {
   editable: boolean;
@@ -70,10 +106,7 @@ const Potion = ({ editable, potion, setPotion }: PotionProps) => {
   const rows: RowType = {};
 
   const setAmount = (ingredientID: number) => {
-    const setAmountForIngredient = (amount_str: string) => {
-      if (!/^\d+$/.test(amount_str)) return;
-      const amount = parseInt(amount_str);
-      if (amount > 25) return;
+    const setAmountForIngredient = (amount: number) => {
       setPotion(config => ({
         ...config,
         [ingredientID]: amount,

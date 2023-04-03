@@ -1,4 +1,11 @@
+import { useState, useEffect } from 'react';
 import { saveDiplomas } from '@/engine/cookie';
+import {
+  getParseIntegerWithDefault,
+  parseAndSetValues,
+  isEquivalentWithDefault,
+  disallowNonDigits,
+} from '@/engine/input_validation';
 
 type DiplomasProps = {
   editable: boolean;
@@ -7,14 +14,25 @@ type DiplomasProps = {
 };
 
 const Diplomas = ({ editable, diplomas, setDiplomas }: DiplomasProps) => {
-  const verifyAndSetDiplomas = (dipl_str: string) => {
-    if (!/^\d+$/.test(dipl_str)) return;
-    const dipl = parseInt(dipl_str);
-    if (dipl > 20) return;
-    if (dipl < 1) return;
+  const [internalDiplomas, setInternalDiplomas] = useState<string>(
+    diplomas.toString()
+  );
+  const setAndSaveDiplomas = (dipl: number) => {
     setDiplomas(dipl);
     saveDiplomas(dipl);
   };
+
+  const isValidNumberOfDiplomas = (dipl: number) => {
+    if (dipl > 20) return false;
+    if (dipl < 1) return false;
+    return true;
+  };
+
+  useEffect(() => {
+    if (!isEquivalentWithDefault(diplomas, internalDiplomas, 1)) {
+      setInternalDiplomas(diplomas.toString());
+    }
+  }, [diplomas]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div>
@@ -26,8 +44,22 @@ const Diplomas = ({ editable, diplomas, setDiplomas }: DiplomasProps) => {
         type="number"
         min="1"
         max="20"
-        value={diplomas}
-        onChange={e => verifyAndSetDiplomas(e.target.value)}
+        value={internalDiplomas}
+        onBeforeInput={disallowNonDigits}
+        onChange={e =>
+          parseAndSetValues(
+            e.target.value,
+            getParseIntegerWithDefault(1),
+            isValidNumberOfDiplomas,
+            setInternalDiplomas,
+            setAndSaveDiplomas
+          )
+        }
+        onBlur={e => {
+          if (e.target.value == '') {
+            setInternalDiplomas('1');
+          }
+        }}
       />
     </div>
   );

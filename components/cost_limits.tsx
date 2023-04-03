@@ -4,6 +4,7 @@ import {
   saveCostLimits,
   setAndSaveStateWrapper,
 } from '@/engine/cookie';
+import { disallowNonDigits } from '@/engine/input_validation';
 
 export type EffectiveCostLimitsType = {
   witchPoints: number;
@@ -125,18 +126,34 @@ const CostLimits = ({
       <input
         id="witchpoints"
         disabled={!editable || costLimit.unlimited}
-        type="text"
+        type={costLimit.unlimited ? 'text' : 'number'}
+        min="0"
+        step="100"
         value={costLimit.unlimited ? '\u221E' : costLimit.witchPoints}
+        onBeforeInput={disallowNonDigits}
         onChange={e => setWitchPointLimit(e.target.value)}
+        onBlur={e => {
+          if (e.target.value == '') {
+            setWitchPointLimit('0');
+          }
+        }}
       />
       <br />
       Max. Diamonds:{' '}
       <input
         id="diamonds"
         disabled={!editable || costLimit.unlimited}
-        type="text"
+        type={costLimit.unlimited ? 'text' : 'number'}
+        min="0"
+        step="25"
         value={costLimit.unlimited ? '\u221E' : costLimit.diamonds}
+        onBeforeInput={disallowNonDigits}
         onChange={e => setDiamondLimit(e.target.value)}
+        onBlur={e => {
+          if (e.target.value == '') {
+            setDiamondLimit('0');
+          }
+        }}
       />
     </div>
   );
