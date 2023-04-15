@@ -1,35 +1,38 @@
-import { effects } from '@/engine/mappings';
+import { useTranslations } from 'next-intl';
 
 type ChanceLineProps = {
   effect: number;
   probability: string;
 };
 
-const ChanceLine = ({ effect, probability }: ChanceLineProps) => (
-  <>
-    <div className={`row ${probability === '0.00%' ? 'zero' : ''}`}>
-      <span className="chance">{probability}</span>
-      <span className="effect">{effects[effect]}</span>
-    </div>
-    <style jsx>{`
-      div.row {
-        display: table-row;
-      }
-      span.effect,
-      span.chance {
-        display: table-cell;
-        padding: 2px;
-        white-space: nowrap;
-      }
-      span.chance {
-        text-align: right;
-      }
-      div.zero span {
-        color: gray;
-      }
-    `}</style>
-  </>
-);
+const ChanceLine = ({ effect, probability }: ChanceLineProps) => {
+  const effectNames = useTranslations('effects');
+  return (
+    <>
+      <div className={`row ${probability === '0.00%' ? 'zero' : ''}`}>
+        <span className="chance">{probability}</span>
+        <span className="effect">{effectNames(effect.toString())}</span>
+      </div>
+      <style jsx>{`
+        div.row {
+          display: table-row;
+        }
+        span.effect,
+        span.chance {
+          display: table-cell;
+          padding: 2px;
+          white-space: nowrap;
+        }
+        span.chance {
+          text-align: right;
+        }
+        div.zero span {
+          color: gray;
+        }
+      `}</style>
+    </>
+  );
+};
 
 export type PotionStatsType = {
   witchPoints: number;

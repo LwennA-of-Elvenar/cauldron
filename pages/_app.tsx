@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { NextIntlProvider } from 'next-intl';
 import type { AppProps } from 'next/app';
 import '@/styles/globals.css';
 
@@ -43,14 +44,16 @@ const App = ({ Component, pageProps }: AppProps) => {
 
   if (error) return <pre>{error.toString()}</pre>;
   return (
-    <Component
-      {...pageProps}
-      db={{
-        loaded: !!worker,
-        worker,
-        setError,
-      }}
-    />
+    <NextIntlProvider messages={pageProps.messages}>
+      <Component
+        {...pageProps}
+        db={{
+          loaded: !!worker,
+          worker,
+          setError,
+        }}
+      />
+    </NextIntlProvider>
   );
 };
 

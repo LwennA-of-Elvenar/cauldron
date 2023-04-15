@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect } from 'react';
-import { effects } from '@/engine/mappings';
+import { useTranslations } from 'next-intl';
 import { saveDesiredEffects, setAndSaveStateWrapper } from '@/engine/cookie';
 
 type DesiredEffectProps = {
@@ -14,39 +14,42 @@ const DesiredEffect = ({
   effect,
   weight,
   setWeight,
-}: DesiredEffectProps) => (
-  <>
-    <div className="row">
-      <span className="effect">{effects[effect]}: </span>
-      <span className="weight">
-        <input
-          id={`effect${effect.toString()}`}
-          disabled={!editable}
-          type="range"
-          min="0.0"
-          max="1.0"
-          step="0.05"
-          value={weight}
-          onChange={e => setWeight(e.target.value)}
-        />
-      </span>
-      <span className="weightDisplay">{weight.toFixed(2)}</span>
-    </div>
-    <style jsx>{`
-      div.row {
-        display: table-row;
-      }
-      span.effect,
-      span.weight,
-      span.weightDisplay {
-        display: table-cell;
-        padding: 1px;
-        text-align: right;
-        white-space: nowrap;
-      }
-    `}</style>
-  </>
-);
+}: DesiredEffectProps) => {
+  const effectNames = useTranslations('effects');
+  return (
+    <>
+      <div className="row">
+        <span className="effect">{effectNames(effect.toString())}: </span>
+        <span className="weight">
+          <input
+            id={`effect${effect.toString()}`}
+            disabled={!editable}
+            type="range"
+            min="0.0"
+            max="1.0"
+            step="0.05"
+            value={weight}
+            onChange={e => setWeight(e.target.value)}
+          />
+        </span>
+        <span className="weightDisplay">{weight.toFixed(2)}</span>
+      </div>
+      <style jsx>{`
+        div.row {
+          display: table-row;
+        }
+        span.effect,
+        span.weight,
+        span.weightDisplay {
+          display: table-cell;
+          padding: 1px;
+          text-align: right;
+          white-space: nowrap;
+        }
+      `}</style>
+    </>
+  );
+};
 
 export type DesiredEffectsType = {
   [x: number]: number;

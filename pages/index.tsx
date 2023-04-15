@@ -7,6 +7,7 @@ import {
   Dispatch,
   MutableRefObject,
 } from 'react';
+import { useTranslations } from 'next-intl';
 import { DBType } from './_app';
 import CostLimits, { EffectiveCostLimitsType } from '@/components/cost_limits';
 import Diplomas from '@/components/diplomas';
@@ -27,6 +28,7 @@ import {
   setAndSaveStateWrapper,
   savePotion,
 } from '@/engine/cookie';
+import { GetStaticPropsContext } from 'next';
 
 type HomeProps = {
   db: DBType;
@@ -50,6 +52,7 @@ export type EngineStateType = {
 };
 
 const Home = ({ db }: HomeProps) => {
+  const t = useTranslations('app');
   const defaultDiamondIngredientConfig: DiamondIngredientConfigType = {};
   const defaultPotion: PotionType = {};
   for (let i = 1; i <= 12; i += 1) {
@@ -137,15 +140,15 @@ const Home = ({ db }: HomeProps) => {
   return (
     <>
       <Head>
-        <title>Cauldron</title>
-        <meta name="description" content="Cauldron Optimizer" />
+        <title>{t('title')}</title>
+        <meta name="description" content={t('description')} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {db.loaded || (
         <div>
-          <h2>Initializing application</h2>
-          <p>Please wait while we fire up the witch&apos;s cauldron...</p>
+          <h2>{t('initialization.title')}</h2>
+          <p>{t('initialization.text')}</p>
         </div>
       )}
       <main>
@@ -183,7 +186,7 @@ const Home = ({ db }: HomeProps) => {
               setPotion(() => defaultPotion);
             }}
           >
-            Reset
+            {t('actions.reset')}
           </button>
           <br />
           <button
@@ -193,7 +196,7 @@ const Home = ({ db }: HomeProps) => {
               calculateChances(engineState);
             }}
           >
-            Calculate Effects
+            {t('actions.calculateEffects')}
           </button>
           <button
             type="button"
@@ -202,14 +205,14 @@ const Home = ({ db }: HomeProps) => {
               optimizePotion(engineState);
             }}
           >
-            Optimize Potion
+            {t('actions.optimize')}
           </button>
           <button
             type="button"
             disabled={!busy || cancelling}
             onClick={() => setCancelling(true)}
           >
-            {cancelling ? 'Cancelling...' : 'Cancel'}
+            {cancelling ? t('actions.cancelInProgress') : t('actions.cancel')}
           </button>
           {warning && <p className="warn">{warning}</p>}
           <PotionStats
@@ -235,5 +238,11 @@ const Home = ({ db }: HomeProps) => {
     </>
   );
 };
+
+export const getStaticProps = async (context: GetStaticPropsContext) => ({
+  props: {
+    messages: (await import(`../messages/${context.locale}.json`)).default,
+  },
+});
 
 export default Home;
