@@ -2,9 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   i18n: {
-    locales: ['en', 'de'],
-    defaultLocale: 'en',
+    locales: ['default', 'en', 'de'],
+    defaultLocale: 'default',
   },
+  trailingSlash: true,
   // inlining images with extension .inline.png
   // https://www.dmitry-ishkov.com/2022/03/inlined-images-in-nextjs.html
   webpack: config => {

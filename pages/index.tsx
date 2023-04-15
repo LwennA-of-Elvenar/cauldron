@@ -145,82 +145,83 @@ const Home = ({ db }: HomeProps) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {db.loaded || (
+      {!db.loaded ? (
         <div>
           <h2>{t('initialization.title')}</h2>
           <p>{t('initialization.text')}</p>
         </div>
+      ) : (
+        <main>
+          <div className="col">
+            <CostLimits
+              editable={editable}
+              effectiveCostLimits={costLimit}
+              setEffectiveCostLimits={setCostLimit}
+            />
+            <Diplomas
+              editable={editable}
+              diplomas={diplomas}
+              setDiplomas={setDiplomas}
+            />
+            <DesiredEffects
+              editable={editable}
+              cookiesLoaded={cookiesLoaded}
+              diplomas={diplomas}
+              desiredEffects={desiredEffects}
+              setDesiredEffects={setDesiredEffects}
+            />
+          </div>
+          <div className="col">
+            <Potion
+              editable={editable}
+              potion={potion}
+              setPotion={setPotion}
+              diamondIngredientConfig={diamondIngredientConfig}
+              setDiamondIngredientConfig={setDiamondIngredientConfig}
+            />
+            <button
+              type="button"
+              disabled={!editable}
+              onClick={() => {
+                setPotion(() => defaultPotion);
+              }}
+            >
+              {t('actions.reset')}
+            </button>
+            <br />
+            <button
+              type="button"
+              disabled={!editable || !recalculationRequired}
+              onClick={() => {
+                calculateChances(engineState);
+              }}
+            >
+              {t('actions.calculateEffects')}
+            </button>
+            <button
+              type="button"
+              disabled={!editable}
+              onClick={() => {
+                optimizePotion(engineState);
+              }}
+            >
+              {t('actions.optimize')}
+            </button>
+            <button
+              type="button"
+              disabled={!busy || cancelling}
+              onClick={() => setCancelling(true)}
+            >
+              {cancelling ? t('actions.cancelInProgress') : t('actions.cancel')}
+            </button>
+            {warning && <p className="warn">{warning}</p>}
+            <PotionStats
+              potionStats={potionStats}
+              recalculationRequired={recalculationRequired && !busy}
+            />
+          </div>
+        </main>
       )}
-      <main>
-        <div className="col">
-          <CostLimits
-            editable={editable}
-            effectiveCostLimits={costLimit}
-            setEffectiveCostLimits={setCostLimit}
-          />
-          <Diplomas
-            editable={editable}
-            diplomas={diplomas}
-            setDiplomas={setDiplomas}
-          />
-          <DesiredEffects
-            editable={editable}
-            cookiesLoaded={cookiesLoaded}
-            diplomas={diplomas}
-            desiredEffects={desiredEffects}
-            setDesiredEffects={setDesiredEffects}
-          />
-        </div>
-        <div className="col">
-          <Potion
-            editable={editable}
-            potion={potion}
-            setPotion={setPotion}
-            diamondIngredientConfig={diamondIngredientConfig}
-            setDiamondIngredientConfig={setDiamondIngredientConfig}
-          />
-          <button
-            type="button"
-            disabled={!editable}
-            onClick={() => {
-              setPotion(() => defaultPotion);
-            }}
-          >
-            {t('actions.reset')}
-          </button>
-          <br />
-          <button
-            type="button"
-            disabled={!editable || !recalculationRequired}
-            onClick={() => {
-              calculateChances(engineState);
-            }}
-          >
-            {t('actions.calculateEffects')}
-          </button>
-          <button
-            type="button"
-            disabled={!editable}
-            onClick={() => {
-              optimizePotion(engineState);
-            }}
-          >
-            {t('actions.optimize')}
-          </button>
-          <button
-            type="button"
-            disabled={!busy || cancelling}
-            onClick={() => setCancelling(true)}
-          >
-            {cancelling ? t('actions.cancelInProgress') : t('actions.cancel')}
-          </button>
-          {warning && <p className="warn">{warning}</p>}
-          <PotionStats
-            potionStats={potionStats}
-            recalculationRequired={recalculationRequired && !busy}
-          />
-        </div>
-      </main>
       <style jsx>{`
         main {
           display: table-row;
@@ -239,10 +240,13 @@ const Home = ({ db }: HomeProps) => {
   );
 };
 
-export const getStaticProps = async (context: GetStaticPropsContext) => ({
-  props: {
-    messages: (await import(`../messages/${context.locale}.json`)).default,
-  },
-});
+export const getStaticProps = async (context: GetStaticPropsContext) => {
+  const locale = context.locale == 'default' ? 'en' : context.locale;
+  return {
+    props: {
+      messages: (await import(`../messages/${locale}.json`)).default,
+    },
+  };
+};
 
 export default Home;

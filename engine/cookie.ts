@@ -17,6 +17,7 @@ const saveConfig = (
 ) => {
   const cookies = new Cookies();
   cookies.set(`${COOKIE_PREFIX}_${cookieName}`, JSON.stringify(configObject), {
+    path: '/',
     maxAge: 315360000,
   });
 };
