@@ -1,4 +1,4 @@
-import { DiamondIngredientConfigType } from '@/components/diamond_ingredients';
+import { DiamondIngredientConfigType } from '@/components/potion';
 import { PotionType } from '@/components/potion';
 import { DesiredEffectsType } from '@/components/desired_effects';
 

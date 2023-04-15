@@ -8,15 +8,15 @@ import {
   MutableRefObject,
 } from 'react';
 import { DBType } from './_app';
-import DiamondIngredientConfig, {
-  DiamondIngredientConfigType,
-} from '@/components/diamond_ingredients';
 import CostLimits, { EffectiveCostLimitsType } from '@/components/cost_limits';
 import Diplomas from '@/components/diplomas';
 import DesiredEffects, {
   DesiredEffectsType,
 } from '@/components/desired_effects';
-import Potion, { PotionType } from '@/components/potion';
+import Potion, {
+  PotionType,
+  DiamondIngredientConfigType,
+} from '@/components/potion';
 import PotionStats, { PotionStatsType } from '@/components/potion_stats';
 import { calculateChances, optimizePotion } from '@/engine/core';
 import {
@@ -150,11 +150,6 @@ const Home = ({ db }: HomeProps) => {
       )}
       <main>
         <div className="col">
-          <DiamondIngredientConfig
-            editable={editable}
-            diamondIngredientConfig={diamondIngredientConfig}
-            setDiamondIngredientConfig={setDiamondIngredientConfig}
-          />
           <CostLimits
             editable={editable}
             effectiveCostLimits={costLimit}
@@ -174,7 +169,13 @@ const Home = ({ db }: HomeProps) => {
           />
         </div>
         <div className="col">
-          <Potion editable={editable} potion={potion} setPotion={setPotion} />
+          <Potion
+            editable={editable}
+            potion={potion}
+            setPotion={setPotion}
+            diamondIngredientConfig={diamondIngredientConfig}
+            setDiamondIngredientConfig={setDiamondIngredientConfig}
+          />
           <button
             type="button"
             disabled={!editable}
