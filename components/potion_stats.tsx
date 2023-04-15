@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl';
+import { EffectText, EffectImage } from '@/components/effect';
 
 type ChanceLineProps = {
   effect: number;
@@ -6,12 +6,16 @@ type ChanceLineProps = {
 };
 
 const ChanceLine = ({ effect, probability }: ChanceLineProps) => {
-  const effectNames = useTranslations('effects');
   return (
     <>
       <div className={`row ${probability === '0.00%' ? 'zero' : ''}`}>
         <span className="chance">{probability}</span>
-        <span className="effect">{effectNames(effect.toString())}</span>
+        <span className="effect">
+          <span className="effectImage">
+            <EffectImage effect={effect} />
+          </span>{' '}
+          <EffectText effect={effect} />
+        </span>
       </div>
       <style jsx>{`
         div.row {
@@ -22,12 +26,17 @@ const ChanceLine = ({ effect, probability }: ChanceLineProps) => {
           display: table-cell;
           padding: 2px;
           white-space: nowrap;
+          vertical-align: middle;
         }
         span.chance {
           text-align: right;
         }
         div.zero span {
           color: gray;
+        }
+        div.zero .effectImage {
+          filter: saturate(0.3);
+          opacity: 0.7;
         }
       `}</style>
     </>

@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
 import { saveDesiredEffects, setAndSaveStateWrapper } from '@/engine/cookie';
+import { EffectText, EffectImage } from '@/components/effect';
 
 type DesiredEffectProps = {
   editable: boolean;
@@ -15,11 +15,12 @@ const DesiredEffect = ({
   weight,
   setWeight,
 }: DesiredEffectProps) => {
-  const effectNames = useTranslations('effects');
   return (
     <>
       <div className="row">
-        <span className="effect">{effectNames(effect.toString())}: </span>
+        <span className="effect">
+          <EffectText effect={effect} /> <EffectImage effect={effect} />{' '}
+        </span>
         <span className="weight">
           <input
             id={`effect${effect.toString()}`}
@@ -42,9 +43,13 @@ const DesiredEffect = ({
         span.weight,
         span.weightDisplay {
           display: table-cell;
-          padding: 1px;
+          padding: 2px;
           text-align: right;
           white-space: nowrap;
+        }
+        span,
+        input {
+          vertical-align: middle;
         }
       `}</style>
     </>
