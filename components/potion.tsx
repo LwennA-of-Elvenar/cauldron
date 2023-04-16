@@ -11,6 +11,7 @@ import {
   imageUseDiamonds,
   imageUseWitchPoints,
   imagesIngredients,
+  imageJar,
 } from '@/assets/assets';
 import { useTranslations } from 'next-intl';
 
@@ -53,8 +54,21 @@ const SinglePotionIngredient = ({
 
   return (
     <>
-      <div className="table">
-        <div className="row">
+      <div className="grid">
+        <div className="jarbox">
+          <Image
+            alt="jar"
+            unoptimized
+            src={imageJar}
+            height="64"
+            width="64"
+            style={{
+              display: 'block',
+              height: 'auto',
+              width: '100%',
+              zIndex: '1',
+            }}
+          />
           <Image
             alt={ingredientNames(ingredientID.toString())}
             title={ingredientNames(ingredientID.toString())}
@@ -63,88 +77,98 @@ const SinglePotionIngredient = ({
             height="64"
             width="64"
             style={{
-              display: 'table-cell',
+              display: 'block',
               height: 'auto',
-              width: '100%',
+              width: '60%',
+              position: 'absolute',
+              top: '20%',
+              left: '20%',
+              zIndex: '2',
             }}
           />
         </div>
-        <div className="row">
-          <input
-            id={`potionIngredient${ingredientID.toString()}`}
-            disabled={!editable}
-            type="number"
-            min="0"
-            max="25"
-            value={internalAmount}
-            onBeforeInput={disallowNonDigits}
-            onChange={e => {
-              parseAndSetValues(
-                e.target.value,
-                parseInteger,
-                isValidAmount,
-                setInternalAmount,
-                setAmount
-              );
-            }}
-            onBlur={e => {
-              if (e.target.value == '') {
-                setInternalAmount('0');
-              }
-            }}
-          />
-        </div>
-        <div className="row">
-          <div
-            className={`diamondSelection ${editable ? 'enabled' : 'disabled'}`}
-            onClick={() => {
-              if (editable) setRequiresDiamonds(!requiresDiamonds);
-            }}
-          >
-            <div className={`${requiresDiamonds && 'hiddenButton'}`}>
-              <Image
-                alt="use witch points"
-                unoptimized
-                src={imageUseWitchPoints}
-                height="64"
-                width="64"
-                style={{
-                  display: 'block',
-                  height: 'auto',
-                  width: '100%',
-                }}
-              />
-            </div>
-            <div className={`${requiresDiamonds || 'hiddenButton'}`}>
-              <Image
-                alt="use diamonds"
-                unoptimized
-                src={imageUseDiamonds}
-                height="64"
-                width="64"
-                style={{
-                  display: 'block',
-                  height: 'auto',
-                  width: '100%',
-                }}
-              />
-            </div>
+        <input
+          id={`potionIngredient${ingredientID.toString()}`}
+          disabled={!editable}
+          type="number"
+          min="0"
+          max="25"
+          value={internalAmount}
+          onBeforeInput={disallowNonDigits}
+          onChange={e => {
+            parseAndSetValues(
+              e.target.value,
+              parseInteger,
+              isValidAmount,
+              setInternalAmount,
+              setAmount
+            );
+          }}
+          onBlur={e => {
+            if (e.target.value == '') {
+              setInternalAmount('0');
+            }
+          }}
+        />
+
+        <div
+          className={`diamondSelection ${editable ? 'enabled' : 'disabled'}`}
+          onClick={() => {
+            if (editable) setRequiresDiamonds(!requiresDiamonds);
+          }}
+        >
+          <div className={`${requiresDiamonds && 'hiddenButton'}`}>
+            <Image
+              alt="use witch points"
+              unoptimized
+              src={imageUseWitchPoints}
+              height="64"
+              width="64"
+              style={{
+                display: 'block',
+                height: 'auto',
+                width: '100%',
+              }}
+            />
+          </div>
+          <div className={`${requiresDiamonds || 'hiddenButton'}`}>
+            <Image
+              alt="use diamonds"
+              unoptimized
+              src={imageUseDiamonds}
+              height="64"
+              width="64"
+              style={{
+                display: 'block',
+                height: 'auto',
+                width: '100%',
+                marginTop: '0.15em',
+              }}
+            />
           </div>
         </div>
       </div>
       <style jsx>{`
-        div.table {
-          display: table;
-          width: 3em;
-        }
-        div.row {
-          display: table-row;
-        }
-        div.diamondSelection {
+        div.grid {
           display: grid;
+          width: 4em;
+          position: relative;
+        }
+        div.jarbox {
+          grid-column: 1;
+          grid-row: 1;
+          position: relative;
         }
         div.enabled:hover {
           filter: brightness(1.2);
+        }
+        div.diamondSelection {
+          position: absolute;
+          z-index: 3;
+          display: grid;
+          top: 0px;
+          right: 0px;
+          width: 1.5em;
         }
         div.diamondSelection > div {
           grid-row: 1;
@@ -158,8 +182,21 @@ const SinglePotionIngredient = ({
           transition: 0.3s;
         }
         input {
-          width: 100%;
+          grid-row: 2;
+          grid-column: 1;
+          width: 75%;
+          margin-left: auto;
+          margin-right: auto;
+          margin-top: -20%;
+          z-index: 3;
           box-sizing: border-box;
+          border: 1px solid black;
+          border-radius: 3px;
+          background-color: beige;
+        }
+        input:disabled {
+          opacity: 100%;
+          background-color: rgb(239, 239, 239);
         }
       `}</style>
     </>
@@ -194,9 +231,6 @@ const PotionIngredientRow = ({
       }
       div.ingredient:last-child {
         padding-right: 0px;
-      }
-      input {
-        width: 3em;
       }
     `}</style>
   </>

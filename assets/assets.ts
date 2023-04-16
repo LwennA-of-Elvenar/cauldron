@@ -10,6 +10,7 @@ import ingredient9 from './ingredients/ingredient9.inline.png';
 import ingredient10 from './ingredients/ingredient10.inline.png';
 import ingredient11 from './ingredients/ingredient11.inline.png';
 import ingredient12 from './ingredients/ingredient12.inline.png';
+import imageJar from './ingredients/jar_empty.inline.png';
 import effect1 from './effects/Effect_Coins.inline.png';
 import effect2 from './effects/Effect_Supplies.inline.png';
 import effect3 from './effects/Effect_B_Strenght.inline.png';
@@ -78,6 +79,7 @@ const imagesEffects: ImageMapping = {
 export {
   imageUseDiamonds,
   imageUseWitchPoints,
+  imageJar,
   imagesIngredients,
   imagesEffects,
 };
