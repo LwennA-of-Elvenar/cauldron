@@ -51,18 +51,18 @@ export type PotionStatsType = {
 
 type PotionStatsProps = {
   potionStats: PotionStatsType;
-  recalculationRequired: boolean;
+  hasValidIngredients: boolean;
 };
 
 const PotionStats = ({
   potionStats,
-  recalculationRequired,
+  hasValidIngredients,
 }: PotionStatsProps) => {
   if (potionStats.witchPoints === 0 && potionStats.diamonds === 0) {
     return null;
   }
   return (
-    <div style={{ visibility: recalculationRequired ? 'hidden' : 'visible' }}>
+    <div style={{ visibility: hasValidIngredients ? 'visible' : 'hidden' }}>
       <h3>Potion Cost and Effect Chances</h3>
       <p>Witch Points: {potionStats.witchPoints}</p>
       <p>Diamonds: {potionStats.diamonds}</p>

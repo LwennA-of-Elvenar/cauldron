@@ -17,9 +17,10 @@ import DesiredEffects, {
 import Potion, {
   PotionType,
   DiamondIngredientConfigType,
+  getTotalIngredients,
 } from '@/components/potion';
 import PotionStats, { PotionStatsType } from '@/components/potion_stats';
-import { calculateChances, optimizePotion } from '@/engine/core';
+import { calculateChances, optimizePotion, Operation } from '@/engine/core';
 import {
   readDesiredEffects,
   readDiamondIngredientsConfig,
@@ -35,11 +36,12 @@ type HomeProps = {
 };
 
 export type EngineStateType = {
-  busy: boolean;
-  setBusy: Dispatch<SetStateAction<boolean>>;
+  currentOperation: MutableRefObject<Operation>;
+  scheduledOperation: MutableRefObject<Operation>;
+  runScheduler: () => void;
   cancelFlag: MutableRefObject<boolean>;
   setCancelling: Dispatch<SetStateAction<boolean>>;
-  setRecalculationRequired: Dispatch<SetStateAction<boolean>>;
+  markRecalculationComplete: () => void;
   setWarning: Dispatch<SetStateAction<null | string>>;
   diamondIngredientConfig: DiamondIngredientConfigType;
   potion: PotionType;
@@ -78,25 +80,61 @@ const Home = ({ db }: HomeProps) => {
   const [diplomas, setDiplomas] = useState(1);
   const [desiredEffects, setDesiredEffects] = useState<DesiredEffectsType>({});
 
-  const [busy, setBusy] = useState(false);
-  const [warning, setWarning] = useState<null | string>(null);
-  const [recalculationRequired, setRecalculationRequired] = useState(true);
-  const [cookiesLoaded, setCookiesLoaded] = useState(false);
-  const [cancelling, setCancelling] = useState(false);
-  const cancelFlag = useRef(false);
+  const [recalculationCounter, setRecalculationCounter] = useState({
+    potionChanges: 0,
+    lastRecalculation: 0,
+  });
+  const currentOperation = useRef(Operation.Idle);
+  const scheduledOperation = useRef(Operation.CalculateChances); // at the beginning calculate chances of what is loaded from cookies
+  const [scheduler, setScheduler] = useState(0);
+  const runScheduler = () => {
+    setScheduler(s => s + 1);
+  };
+  const timer: MutableRefObject<null | ReturnType<typeof setTimeout>> =
+    useRef(null);
 
-  const editable = db.loaded && cookiesLoaded && !busy;
+  const [cookiesLoaded, setCookiesLoaded] = useState(false);
+  const [warning, setWarning] = useState<null | string>(null);
+  const [cancelling, setCancelling] = useState(false);
+  const cancelFlag = useRef(cancelling);
+  cancelFlag.current = cancelling;
+
+  const editable =
+    db.loaded &&
+    cookiesLoaded &&
+    currentOperation.current != Operation.OptimizePotion;
 
   const setPotion = (setStateFunc: SetStateAction<PotionType>) => {
     setAndSaveStateWrapper(setStateFunc, potion, setPotionRaw, savePotion);
   };
 
+  const clearRecalculation = () => {
+    if (timer.current !== null) {
+      clearTimeout(timer.current);
+    }
+  };
+
+  const markRecalculationComplete = (counterAtBeginning: number) => {
+    const markRecalculationCompleteAsOfBeginning = () => {
+      setRecalculationCounter(counter => {
+        return {
+          ...counter,
+          lastRecalculation: counterAtBeginning,
+        };
+      });
+    };
+    return markRecalculationCompleteAsOfBeginning;
+  };
+
   const engineState: EngineStateType = {
-    busy,
-    setBusy,
+    currentOperation,
+    scheduledOperation,
+    runScheduler,
     cancelFlag,
     setCancelling,
-    setRecalculationRequired,
+    markRecalculationComplete: markRecalculationComplete(
+      recalculationCounter.potionChanges
+    ),
     setWarning,
     diamondIngredientConfig,
     potion,
@@ -108,6 +146,8 @@ const Home = ({ db }: HomeProps) => {
     db,
   };
 
+  // at startup, load all cookies
+  // at teardown, clear recalculation timer
   useEffect(() => {
     const savedDiamondIngredientsConfig = readDiamondIngredientsConfig();
     if (savedDiamondIngredientsConfig)
@@ -123,19 +163,75 @@ const Home = ({ db }: HomeProps) => {
     if (savedPotion) setPotionRaw(savedPotion);
 
     setCookiesLoaded(true);
+    return () => {
+      clearRecalculation();
+    };
   }, []);
 
+  // whenever the potion or something affecting the chances changes,
+  // increase a recalculation counter.
   useEffect(() => {
-    cancelFlag.current = cancelling;
-  }, [cancelling]);
-
-  useEffect(() => {
-    setRecalculationRequired(true);
+    setRecalculationCounter(counter => {
+      return {
+        ...counter,
+        potionChanges: counter.potionChanges + 1,
+      };
+    });
   }, [
     ...Object.values(potion), // eslint-disable-line react-hooks/exhaustive-deps
     ...Object.values(diamondIngredientConfig), // eslint-disable-line react-hooks/exhaustive-deps
     diplomas,
   ]);
+
+  // When the recalculation counter changes, the chances will be calculated.
+  // At the end of the calculation (markRecalculationComplete), the value of the counter at the begin
+  // of the calculation is saved (lastRecalculation). This allows to identify if something
+  // changed while the recalculation was running and retrigger a new recalculation.
+  // The calculation is not performed immediately, but scheduled and only run if no changes for a certain
+  // time were detected
+  useEffect(() => {
+    if (
+      recalculationCounter.potionChanges !=
+      recalculationCounter.lastRecalculation
+    ) {
+      clearRecalculation();
+      scheduledOperation.current = Operation.CalculateChances;
+      timer.current = setTimeout(() => {
+        runScheduler();
+      }, 300);
+    }
+  }, [
+    recalculationCounter.potionChanges,
+    recalculationCounter.lastRecalculation,
+  ]);
+
+  // check if there is a scheduled operation that can be run (i.e. app is initialized and nothing running yet)
+  useEffect(
+    () => {
+      if (
+        db.loaded &&
+        cookiesLoaded &&
+        currentOperation.current == Operation.Idle &&
+        scheduledOperation.current != Operation.Idle
+      ) {
+        if (scheduledOperation.current == Operation.CalculateChances) {
+          clearRecalculation();
+          calculateChances(engineState);
+        } else if (scheduledOperation.current == Operation.OptimizePotion) {
+          clearRecalculation();
+          optimizePotion(engineState);
+        }
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      scheduler,
+      db.loaded,
+      cookiesLoaded,
+      currentOperation.current,
+      scheduledOperation.current,
+    ]
+  );
 
   return (
     <>
@@ -191,25 +287,21 @@ const Home = ({ db }: HomeProps) => {
             <br />
             <button
               type="button"
-              disabled={!editable || !recalculationRequired}
+              hidden={!editable}
               onClick={() => {
-                calculateChances(engineState);
-              }}
-            >
-              {t('actions.calculateEffects')}
-            </button>
-            <button
-              type="button"
-              disabled={!editable}
-              onClick={() => {
-                optimizePotion(engineState);
+                scheduledOperation.current = Operation.OptimizePotion;
+                runScheduler();
               }}
             >
               {t('actions.optimize')}
             </button>
             <button
               type="button"
-              disabled={!busy || cancelling}
+              hidden={currentOperation.current != Operation.OptimizePotion}
+              disabled={
+                currentOperation.current != Operation.OptimizePotion ||
+                cancelling
+              }
               onClick={() => setCancelling(true)}
             >
               {cancelling ? t('actions.cancelInProgress') : t('actions.cancel')}
@@ -217,7 +309,10 @@ const Home = ({ db }: HomeProps) => {
             {warning && <p className="warn">{warning}</p>}
             <PotionStats
               potionStats={potionStats}
-              recalculationRequired={recalculationRequired && !busy}
+              hasValidIngredients={
+                getTotalIngredients(potion) > 0 &&
+                getTotalIngredients(potion) <= 25
+              }
             />
           </div>
         </main>

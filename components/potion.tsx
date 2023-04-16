@@ -221,6 +221,10 @@ type RowType = {
   [x: number]: Array<SinglePotionIngredientType>;
 };
 
+export const getTotalIngredients = (potion: PotionType) => {
+  return Object.values(potion).reduce((prev, curr) => prev + curr, 0);
+};
+
 const Potion = ({
   editable,
   potion,
@@ -268,8 +272,7 @@ const Potion = ({
     rows[row] = currentRow;
   }
 
-  const validPotionConfig =
-    Object.values(potion).reduce((prev, curr) => prev + curr, 0) <= 25;
+  const validPotionConfig = getTotalIngredients(potion) <= 25;
 
   const validDiamondConfig =
     Object.values(diamondIngredientConfig).reduce(

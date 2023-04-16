@@ -10,28 +10,40 @@ import { EngineStateType } from '@/pages';
 import { PotionType } from '@/components/potion';
 import { PotionStatsType } from '@/components/potion_stats';
 
+export enum Operation {
+  Idle,
+  CalculateChances,
+  OptimizePotion,
+}
+
 const startOperation = (engineState: EngineStateType) => {
   engineState.setCancelling(false);
-  engineState.setBusy(true);
-  engineState.setWarning('running...');
+  engineState.currentOperation.current = engineState.scheduledOperation.current;
+  engineState.scheduledOperation.current = Operation.Idle;
+  if (engineState.currentOperation.current == Operation.OptimizePotion) {
+    engineState.setWarning('running...');
+  }
 };
 
 const finishOperation = (engineState: EngineStateType) => {
   engineState.setCancelling(false);
-  engineState.setBusy(false);
+  engineState.currentOperation.current = Operation.Idle;
   engineState.setWarning(null);
+  engineState.runScheduler();
 };
 
 const cancelOperation = (engineState: EngineStateType) => {
   engineState.setCancelling(false);
-  engineState.setBusy(false);
+  engineState.currentOperation.current = Operation.Idle;
   engineState.setWarning('Operation cancelled');
+  engineState.runScheduler();
 };
 
 const failOperation = (engineState: EngineStateType, message: string) => {
   engineState.setCancelling(false);
-  engineState.setBusy(false);
+  engineState.currentOperation.current = Operation.Idle;
   engineState.setWarning(message);
+  engineState.runScheduler();
 };
 
 const formatPotionStats = (result: Array<QueryExecResult>) => {
@@ -75,14 +87,12 @@ export const calculateChances = (
       return;
     }
     engineState.setPotionStats(formatPotionStats(results));
-    engineState.setRecalculationRequired(false);
     if (callAfter) {
       callAfter();
     } else {
-      finishOperation(engineState);
+      engineState.markRecalculationComplete();
     }
   };
-  if (!callAfter) startOperation(engineState);
   worker.postMessage({
     action: 'exec',
     sql: statement,
@@ -148,6 +158,7 @@ export const optimizePotion = (
       });
       return;
     }
+    engineState.setPotion(() => newPotion);
     if (engineState.cancelFlag.current) {
       calculateChances(engineState, insertPotionIntoDB(newPotion), () => {
         cancelOperation(engineState);
@@ -157,7 +168,6 @@ export const optimizePotion = (
     calculateChances(engineState, insertPotionIntoDB(newPotion), () => {
       optimizePotion(engineState, true);
     });
-    engineState.setPotion(() => newPotion);
   };
   if (!continuation) startOperation(engineState);
   worker.postMessage({
