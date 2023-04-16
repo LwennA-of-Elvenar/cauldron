@@ -2,8 +2,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { Cookies } from 'react-cookie';
 import { CostLimitsType } from '@/components/cost_limits';
 import { DesiredEffectsType } from '@/components/desired_effects';
-import { DiamondIngredientConfigType } from '@/components/diamond_ingredients';
-import { PotionType } from '@/components/potion';
+import { PotionType, DiamondIngredientConfigType } from '@/components/potion';
 
 const COOKIE_PREFIX = 'cauldron_config';
 
@@ -18,6 +17,7 @@ const saveConfig = (
 ) => {
   const cookies = new Cookies();
   cookies.set(`${COOKIE_PREFIX}_${cookieName}`, JSON.stringify(configObject), {
+    path: '/',
     maxAge: 315360000,
   });
 };

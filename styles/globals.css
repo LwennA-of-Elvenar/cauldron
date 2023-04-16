@@ -76,6 +76,7 @@
 body {
   min-width: 700px;
   min-height: 100vh;
+  margin: 0px;
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,

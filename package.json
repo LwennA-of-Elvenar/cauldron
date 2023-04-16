@@ -8,15 +8,21 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "engines": {
+    "node": "^18.0.0"
+  },
   "dependencies": {
     "@types/node": "18.15.11",
     "@types/react": "18.0.31",
     "@types/react-dom": "18.0.11",
     "next": "13.2.4",
+    "next-intl": "^2.13.0",
     "react": "18.2.0",
     "react-cookie": "^4.1.1",
     "react-dom": "18.2.0",
-    "typescript": "5.0.3"
+    "typescript": "5.0.3",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.79.0"
   },
   "devDependencies": {
     "@ijsto/eslint-config": "^4.5.3",

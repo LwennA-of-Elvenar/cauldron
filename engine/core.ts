@@ -10,28 +10,46 @@ import { EngineStateType } from '@/pages';
 import { PotionType } from '@/components/potion';
 import { PotionStatsType } from '@/components/potion_stats';
 
+export enum Operation {
+  Idle,
+  CalculateChances,
+  OptimizePotion,
+}
+
+enum CalculationOutcome {
+  Same,
+  Better,
+  Failed,
+}
+
 const startOperation = (engineState: EngineStateType) => {
   engineState.setCancelling(false);
-  engineState.setBusy(true);
-  engineState.setWarning('running...');
+  engineState.currentOperation.current = engineState.scheduledOperation.current;
+  engineState.scheduledOperation.current = Operation.Idle;
+  if (engineState.currentOperation.current == Operation.OptimizePotion) {
+    engineState.setWarning(engineState.t('calculation.running'));
+  }
 };
 
 const finishOperation = (engineState: EngineStateType) => {
   engineState.setCancelling(false);
-  engineState.setBusy(false);
+  engineState.currentOperation.current = Operation.Idle;
   engineState.setWarning(null);
+  engineState.runScheduler();
 };
 
 const cancelOperation = (engineState: EngineStateType) => {
   engineState.setCancelling(false);
-  engineState.setBusy(false);
-  engineState.setWarning('Operation cancelled');
+  engineState.currentOperation.current = Operation.Idle;
+  engineState.setWarning(engineState.t('calculation.cancelled'));
+  engineState.runScheduler();
 };
 
 const failOperation = (engineState: EngineStateType, message: string) => {
   engineState.setCancelling(false);
-  engineState.setBusy(false);
+  engineState.currentOperation.current = Operation.Idle;
   engineState.setWarning(message);
+  engineState.runScheduler();
 };
 
 const formatPotionStats = (result: Array<QueryExecResult>) => {
@@ -71,18 +89,21 @@ export const calculateChances = (
   worker.onmessage = e => {
     const { results } = e.data;
     if (!results) {
-      failOperation(engineState, e.data.error);
+      failOperation(
+        engineState,
+        engineState.t('calculation.engineError', {
+          error: e.data.error,
+        })
+      );
       return;
     }
     engineState.setPotionStats(formatPotionStats(results));
-    engineState.setRecalculationRequired(false);
     if (callAfter) {
       callAfter();
     } else {
-      finishOperation(engineState);
+      engineState.markRecalculationComplete();
     }
   };
-  if (!callAfter) startOperation(engineState);
   worker.postMessage({
     action: 'exec',
     sql: statement,
@@ -91,7 +112,7 @@ export const calculateChances = (
 
 const convertPotion = (results: Array<QueryExecResult>) => {
   const failure = {
-    outcome: 'failed',
+    outcome: CalculationOutcome.Failed,
     newPotion: null,
   };
   if (results.length < 1) return failure;
@@ -105,7 +126,7 @@ const convertPotion = (results: Array<QueryExecResult>) => {
     potion[data[i][4] as number] = data[i][5] as number;
   }
   return {
-    outcome: sample === 0 ? 'same' : 'better',
+    outcome: sample === 0 ? CalculationOutcome.Same : CalculationOutcome.Better,
     newPotion: potion,
   };
 };
@@ -131,23 +152,29 @@ export const optimizePotion = (
   worker.onmessage = e => {
     const { results } = e.data;
     if (!results) {
-      failOperation(engineState, e.data.error);
-      return;
-    }
-    const { outcome, newPotion } = convertPotion(results);
-    if (outcome === 'failed' || newPotion === null) {
       failOperation(
         engineState,
-        "The witch's assistant was unable to find a potion matching all desired effects. Try to remove some desired effects, or increase the cost limit, or start with a potion that uses e.g. one of each ingredient."
+        engineState.t('calculation.engineError', {
+          error: e.data.error,
+        })
       );
       return;
     }
-    if (outcome === 'same') {
+    const { outcome, newPotion } = convertPotion(results);
+    if (outcome == CalculationOutcome.Failed || newPotion === null) {
+      failOperation(
+        engineState,
+        engineState.t('calculation.errorUnableToOptimize')
+      );
+      return;
+    }
+    if (outcome == CalculationOutcome.Same) {
       calculateChances(engineState, insertPotionIntoDB(newPotion), () => {
         finishOperation(engineState);
       });
       return;
     }
+    engineState.setPotion(() => newPotion);
     if (engineState.cancelFlag.current) {
       calculateChances(engineState, insertPotionIntoDB(newPotion), () => {
         cancelOperation(engineState);
@@ -157,7 +184,6 @@ export const optimizePotion = (
     calculateChances(engineState, insertPotionIntoDB(newPotion), () => {
       optimizePotion(engineState, true);
     });
-    engineState.setPotion(() => newPotion);
   };
   if (!continuation) startOperation(engineState);
   worker.postMessage({

@@ -1,0 +1,86 @@
+{
+  "app": {
+    "title": "Cauldron",
+    "description": "Cauldron Optimizer",
+    "initialization": {
+      "title": "Initializing application",
+      "text": "Please wait while we fire up the witch''s cauldron..."
+    },
+    "actions": {
+      "reset": "Dump Potion",
+      "optimize": "Optimize Potion",
+      "cancel": "Cancel",
+      "cancelInProgress": "Cancelling"
+    },
+    "calculation": {
+      "running": "brewing...",
+      "cancelled": "Operation cancelled",
+      "engineError": "Error in calculation engine: {error}",
+      "errorUnableToOptimize": "The witch's assistant was unable to find a potion matching all desired effects. Try to remove some desired effects, or increase the cost limit, or start with a potion that uses e.g. one of each ingredient."
+    }
+  },
+  "costLimits": {
+    "title": "Configure Cost Limit",
+    "unlimited": "unlimited",
+    "maxWitchPoints": "Max. Witch Points",
+    "maxDiamonds": "Max. Diamonds"
+  },
+  "desiredEffects": {
+    "title": "Desired Effects",
+    "errorNoEffectChosen": "You need to choose at least one desired effect."
+  },
+  "diplomas": {
+    "title": "Research Diplomas",
+    "diplomas": "Number of Diplomas"
+  },
+  "potion": {
+    "title": "Potion",
+    "infoOrder": "Add the ingredients in the right order!",
+    "detailsOrder": "Always add the ingredients with highest amounts first in order to get the lowest costs",
+    "errorFourDiamondIngredients": "Please select exactly 4 ingredients that need diamonds.",
+    "errorMaxIngredients": "You cannot use more than 25 ingredients in one potion."
+  },
+  "potionStats": {
+    "title": "Potion Cost and Effect Chances",
+    "witchPoints": "Witch Points",
+    "diamonds": "Diamonds"
+  },
+  "effects": {
+    "1": "Money",
+    "2": "Supplies",
+    "3": "Barracks Strength",
+    "4": "T1 Goods",
+    "5": "T2 Goods",
+    "6": "T3 Goods",
+    "7": "Training Grounds Strength",
+    "8": "Portal Production",
+    "9": "Orcs",
+    "10": "Mana",
+    "11": "Mercenary Camp Strength",
+    "12": "Seeds",
+    "13": "T4 Goods",
+    "14": "T5 Goods",
+    "15": "T6 Goods",
+    "16": "Training Grounds Health",
+    "17": "Mercenary Camp Health",
+    "18": "Unurium",
+    "19": "T7 Goods",
+    "20": "T8 Goods",
+    "21": "T9 Goods",
+    "22": "Barracks Health"
+  },
+  "ingredients": {
+    "1": "Fire Spore",
+    "2": "Beetlenut",
+    "3": "Mana Shell",
+    "4": "Flying Iris",
+    "5": "Medusa Egg",
+    "6": "Caterpillar Lime",
+    "7": "Nightshade Blossom",
+    "8": "Mocking Tongues",
+    "9": "Eye Sprouts",
+    "10": "Bitterhair Leaf",
+    "11": "Cottoncloud Bud",
+    "12": "Ear Truffle"
+  }
+}

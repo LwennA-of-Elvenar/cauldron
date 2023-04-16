@@ -1,4 +1,5 @@
 import { useState, useEffect, SetStateAction, Dispatch } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   readCostLimits,
   saveCostLimits,
@@ -26,6 +27,7 @@ const CostLimits = ({
   effectiveCostLimits,
   setEffectiveCostLimits,
 }: CostLimitsProps) => {
+  const t = useTranslations('costLimits');
   const defaultCostLimits = {
     unlimited: false,
     witchPoints: 1000,
@@ -110,7 +112,7 @@ const CostLimits = ({
 
   return (
     <div>
-      <h3>Configure Cost Limit</h3>
+      <h3>{t('title')}</h3>
       <label>
         <input
           id="unlimited"
@@ -119,10 +121,10 @@ const CostLimits = ({
           checked={costLimit.unlimited}
           onChange={() => setUnlimitedState(!costLimit.unlimited)}
         />
-        unlimited
+        {t('unlimited')}
       </label>
       <br />
-      Max. Witch Points:{' '}
+      {t('maxWitchPoints')}:{' '}
       <input
         id="witchpoints"
         disabled={!editable || costLimit.unlimited}
@@ -139,7 +141,7 @@ const CostLimits = ({
         }}
       />
       <br />
-      Max. Diamonds:{' '}
+      {t('maxDiamonds')}:{' '}
       <input
         id="diamonds"
         disabled={!editable || costLimit.unlimited}

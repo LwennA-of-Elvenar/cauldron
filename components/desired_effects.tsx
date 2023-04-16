@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, useEffect } from 'react';
-import { effects } from '@/engine/mappings';
+import { useTranslations } from 'next-intl';
 import { saveDesiredEffects, setAndSaveStateWrapper } from '@/engine/cookie';
+import { EffectText, EffectImage } from '@/components/effect';
 
 type DesiredEffectProps = {
   editable: boolean;
@@ -14,39 +15,47 @@ const DesiredEffect = ({
   effect,
   weight,
   setWeight,
-}: DesiredEffectProps) => (
-  <>
-    <div className="row">
-      <span className="effect">{effects[effect]}: </span>
-      <span className="weight">
-        <input
-          id={`effect${effect.toString()}`}
-          disabled={!editable}
-          type="range"
-          min="0.0"
-          max="1.0"
-          step="0.05"
-          value={weight}
-          onChange={e => setWeight(e.target.value)}
-        />
-      </span>
-      <span className="weightDisplay">{weight.toFixed(2)}</span>
-    </div>
-    <style jsx>{`
-      div.row {
-        display: table-row;
-      }
-      span.effect,
-      span.weight,
-      span.weightDisplay {
-        display: table-cell;
-        padding: 1px;
-        text-align: right;
-        white-space: nowrap;
-      }
-    `}</style>
-  </>
-);
+}: DesiredEffectProps) => {
+  return (
+    <>
+      <div className="row">
+        <span className="effect">
+          <EffectText effect={effect} /> <EffectImage effect={effect} />{' '}
+        </span>
+        <span className="weight">
+          <input
+            id={`effect${effect.toString()}`}
+            disabled={!editable}
+            type="range"
+            min="0.0"
+            max="1.0"
+            step="0.05"
+            value={weight}
+            onChange={e => setWeight(e.target.value)}
+          />
+        </span>
+        <span className="weightDisplay">{weight.toFixed(2)}</span>
+      </div>
+      <style jsx>{`
+        div.row {
+          display: table-row;
+        }
+        span.effect,
+        span.weight,
+        span.weightDisplay {
+          display: table-cell;
+          padding: 2px;
+          text-align: right;
+          white-space: nowrap;
+        }
+        span,
+        input {
+          vertical-align: middle;
+        }
+      `}</style>
+    </>
+  );
+};
 
 export type DesiredEffectsType = {
   [x: number]: number;
@@ -67,6 +76,7 @@ const DesiredEffects = ({
   desiredEffects,
   setDesiredEffects,
 }: DesiredEffectsProps) => {
+  const t = useTranslations('desiredEffects');
   const effectiveDesiredEffects = [];
   for (let i = 1; i <= diplomas; i += 1) {
     effectiveDesiredEffects.push({
@@ -117,7 +127,7 @@ const DesiredEffects = ({
   return (
     <>
       <div>
-        <h3>Desired Effects</h3>
+        <h3>{t('title')}</h3>
         {effectiveDesiredEffects.map((effect, index) => (
           <DesiredEffect
             key={index}
@@ -130,9 +140,7 @@ const DesiredEffects = ({
       </div>
       {validConfig || (
         <div>
-          <p className="error">
-            You need to choose at least one desired effect.
-          </p>
+          <p className="error">{t('errorNoEffectChosen')}</p>
         </div>
       )}
       <style jsx>{`

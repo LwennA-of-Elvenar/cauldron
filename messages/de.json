@@ -1,0 +1,86 @@
+{
+  "app": {
+    "title": "Hexenkessel",
+    "description": "Hexenkessel Optimierer",
+    "initialization": {
+      "title": "Initialisiere Anwendung",
+      "text": "Bitte warten während der Hexenkessel angefeuert wird..."
+    },
+    "actions": {
+      "reset": "Trank wegschmeißen",
+      "optimize": "Trank optimieren",
+      "cancel": "Abbrechen",
+      "cancelInProgress": "Abbrechen..."
+    },
+    "calculation": {
+      "running": "braue...",
+      "cancelled": "Berechnung abgebrochen",
+      "engineError": "Fehler in der Berechnung: {error}",
+      "errorUnableToOptimize": "Der Zauberlehrling war nicht in der Lage einen Trank zu finden, der alle gewünschten Effekte enthält. Versuche es mit weniger gewünschten Effekten oder erhöhe die Kostenlimits oder starte die Optimierung von einem Trank der z.B. von jeder Zutat eine verwendet."
+    }
+  },
+  "costLimits": {
+    "title": "Kostenlimit konfigurieren",
+    "unlimited": "unbegrenzt",
+    "maxWitchPoints": "Max. Hexenpunkte",
+    "maxDiamonds": "Max. Diamanten"
+  },
+  "desiredEffects": {
+    "title": "Gewünschte Effekte",
+    "errorNoEffectChosen": "Mindestens ein gewünschter Effekt muss gewählt werden."
+  },
+  "diplomas": {
+    "title": "Forschungsdiplome",
+    "diplomas": "Anzahl Diplome"
+  },
+  "potion": {
+    "title": "Trank",
+    "infoOrder": "Füge die Zutaten in der richtigen Reihenfolge hinzu!",
+    "detailsOrder": "Lege immer die Zutat mit der höchsten Anzahl als erstes in den Kessel um die geringsten Kosten zu erhalten",
+    "errorFourDiamondIngredients": "Es müssen genau 4 Zutaten markiert werden, die Diamanten benötigen.",
+    "errorMaxIngredients": "Ein Trank kann nicht aus mehr als 25 Zutaten bestehen."
+  },
+  "potionStats": {
+    "title": "Kosten und Effektwahrscheinlichkeiten des Tranks",
+    "witchPoints": "Hexenpunkte",
+    "diamonds": "Diamanten"
+  },
+  "effects": {
+    "1": "Münzen",
+    "2": "Vorräte",
+    "3": "Stärke Kaserne",
+    "4": "T1 Güter",
+    "5": "T2 Güter",
+    "6": "T3 Güter",
+    "7": "Stärke Trainingsgelände",
+    "8": "Portalproduction",
+    "9": "Orks",
+    "10": "Mana",
+    "11": "Stärke Söldnerlager",
+    "12": "Saat",
+    "13": "T4 Güter",
+    "14": "T5 Güter",
+    "15": "T6 Güter",
+    "16": "Leben Trainingsgelände",
+    "17": "Leben Söldnerlager",
+    "18": "Unurium",
+    "19": "T7 Güter",
+    "20": "T8 Güter",
+    "21": "T9 Güter",
+    "22": "Leben Kaserne"
+  },
+  "ingredients": {
+    "1": "Feuerspore",
+    "2": "Käfernuss",
+    "3": "Schneckengehäuse",
+    "4": "Fliegende Iris",
+    "5": "Ei der Medusa",
+    "6": "Maden-Limette",
+    "7": "Nachtschattenblüte",
+    "8": "Spottzungen",
+    "9": "Augensprossen",
+    "10": "Bitterhaarblatt",
+    "11": "Wolkenwolle-Knospe",
+    "12": "Ohrentrüffel"
+  }
+}
