@@ -36,6 +36,7 @@ type HomeProps = {
 };
 
 export type EngineStateType = {
+  t: ReturnType<typeof useTranslations>;
   currentOperation: MutableRefObject<Operation>;
   scheduledOperation: MutableRefObject<Operation>;
   runScheduler: () => void;
@@ -127,6 +128,7 @@ const Home = ({ db }: HomeProps) => {
   };
 
   const engineState: EngineStateType = {
+    t,
     currentOperation,
     scheduledOperation,
     runScheduler,

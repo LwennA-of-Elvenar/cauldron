@@ -7,11 +7,43 @@
       "text": "Please wait while we fire up the witch''s cauldron..."
     },
     "actions": {
-      "reset": "Reset",
+      "reset": "Dump Potion",
       "optimize": "Optimize Potion",
       "cancel": "Cancel",
       "cancelInProgress": "Cancelling"
+    },
+    "calculation": {
+      "running": "brewing...",
+      "cancelled": "Operation cancelled",
+      "engineError": "Error in calculation engine: {error}",
+      "errorUnableToOptimize": "The witch's assistant was unable to find a potion matching all desired effects. Try to remove some desired effects, or increase the cost limit, or start with a potion that uses e.g. one of each ingredient."
     }
+  },
+  "costLimits": {
+    "title": "Configure Cost Limit",
+    "unlimited": "unlimited",
+    "maxWitchPoints": "Max. Witch Points",
+    "maxDiamonds": "Max. Diamonds"
+  },
+  "desiredEffects": {
+    "title": "Desired Effects",
+    "errorNoEffectChosen": "You need to choose at least one desired effect."
+  },
+  "diplomas": {
+    "title": "Research Diplomas",
+    "diplomas": "Number of Diplomas"
+  },
+  "potion": {
+    "title": "Potion",
+    "infoOrder": "Add the ingredients in the right order!",
+    "detailsOrder": "Always add the ingredients with highest amounts first in order to get the lowest costs",
+    "errorFourDiamondIngredients": "Please select exactly 4 ingredients that need diamonds.",
+    "errorMaxIngredients": "You cannot use more than 25 ingredients in one potion."
+  },
+  "potionStats": {
+    "title": "Potion Cost and Effect Chances",
+    "witchPoints": "Witch Points",
+    "diamonds": "Diamonds"
   },
   "effects": {
     "1": "Money",

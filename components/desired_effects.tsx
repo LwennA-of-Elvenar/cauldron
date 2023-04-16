@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { saveDesiredEffects, setAndSaveStateWrapper } from '@/engine/cookie';
 import { EffectText, EffectImage } from '@/components/effect';
 
@@ -75,6 +76,7 @@ const DesiredEffects = ({
   desiredEffects,
   setDesiredEffects,
 }: DesiredEffectsProps) => {
+  const t = useTranslations('desiredEffects');
   const effectiveDesiredEffects = [];
   for (let i = 1; i <= diplomas; i += 1) {
     effectiveDesiredEffects.push({
@@ -125,7 +127,7 @@ const DesiredEffects = ({
   return (
     <>
       <div>
-        <h3>Desired Effects</h3>
+        <h3>{t('title')}</h3>
         {effectiveDesiredEffects.map((effect, index) => (
           <DesiredEffect
             key={index}
@@ -138,9 +140,7 @@ const DesiredEffects = ({
       </div>
       {validConfig || (
         <div>
-          <p className="error">
-            You need to choose at least one desired effect.
-          </p>
+          <p className="error">{t('errorNoEffectChosen')}</p>
         </div>
       )}
       <style jsx>{`

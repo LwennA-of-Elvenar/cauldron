@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { EffectText, EffectImage } from '@/components/effect';
 
 type ChanceLineProps = {
@@ -58,14 +59,19 @@ const PotionStats = ({
   potionStats,
   hasValidIngredients,
 }: PotionStatsProps) => {
+  const t = useTranslations('potionStats');
   if (potionStats.witchPoints === 0 && potionStats.diamonds === 0) {
     return null;
   }
   return (
     <div style={{ visibility: hasValidIngredients ? 'visible' : 'hidden' }}>
-      <h3>Potion Cost and Effect Chances</h3>
-      <p>Witch Points: {potionStats.witchPoints}</p>
-      <p>Diamonds: {potionStats.diamonds}</p>
+      <h3>{t('title')}</h3>
+      <p>
+        {t('witchPoints')}: {potionStats.witchPoints}
+      </p>
+      <p>
+        {t('diamonds')}: {potionStats.diamonds}
+      </p>
       <div>
         {potionStats.effects.map((effect, index) => (
           <ChanceLine

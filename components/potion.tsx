@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import {
   parseInteger,
   parseAndSetValues,
@@ -13,7 +14,6 @@ import {
   imagesIngredients,
   imageJar,
 } from '@/assets/assets';
-import { useTranslations } from 'next-intl';
 
 type SinglePotionIngredientType = {
   ingredientID: number;
@@ -269,6 +269,7 @@ const Potion = ({
   diamondIngredientConfig,
   setDiamondIngredientConfig,
 }: PotionProps) => {
+  const t = useTranslations('potion');
   const ingredientNames = useTranslations('ingredients');
 
   const rows: RowType = {};
@@ -331,13 +332,13 @@ const Potion = ({
   return (
     <>
       <div>
-        <h3>Potion</h3>
+        <h3>{t('title')}</h3>
       </div>
       <p>
-        Add the ingredients in the right order!{' '}
+        {t('infoOrder')}{' '}
         <span
           className="orderInfo"
-          title={`Always add the ingredients with highest amounts first in order to get the lowest costs\n\n${orderedIngredientsText}`}
+          title={`${t('detailsOrder')}\n\n${orderedIngredientsText}`}
         >
           {'\u{1F6C8}'}
         </span>
@@ -353,16 +354,12 @@ const Potion = ({
       </div>
       {validDiamondConfig || (
         <div>
-          <p className="error">
-            Please select exactly 4 ingredients that need diamonds.
-          </p>
+          <p className="error">{t('errorFourDiamondIngredients')}</p>
         </div>
       )}
       {validPotionConfig || (
         <div>
-          <p className="error">
-            You cannot use more than 25 ingredients in one potion.
-          </p>
+          <p className="error">{t('errorMaxIngredients')}</p>
         </div>
       )}
       <style jsx>{`

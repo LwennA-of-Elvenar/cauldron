@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { saveDiplomas } from '@/engine/cookie';
 import {
   getParseIntegerWithDefault,
@@ -14,6 +15,7 @@ type DiplomasProps = {
 };
 
 const Diplomas = ({ editable, diplomas, setDiplomas }: DiplomasProps) => {
+  const t = useTranslations('diplomas');
   const [internalDiplomas, setInternalDiplomas] = useState<string>(
     diplomas.toString()
   );
@@ -36,8 +38,8 @@ const Diplomas = ({ editable, diplomas, setDiplomas }: DiplomasProps) => {
 
   return (
     <div>
-      <h3>Research Diplomas</h3>
-      Number of Diplomas:{' '}
+      <h3>{t('title')}</h3>
+      {t('diplomas')}:{' '}
       <input
         id="diplomas"
         disabled={!editable}
