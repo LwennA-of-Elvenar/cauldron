@@ -12,6 +12,7 @@ import {
   imageUseWitchPoints,
   imagesIngredients,
 } from '@/assets/assets';
+import { useTranslations } from 'next-intl';
 
 type SinglePotionIngredientType = {
   ingredientID: number;
@@ -33,6 +34,7 @@ const SinglePotionIngredient = ({
   requiresDiamonds,
   setRequiresDiamonds,
 }: SinglePotionIngredientProps) => {
+  const ingredientNames = useTranslations('ingredients');
   const [internalAmount, setInternalAmount] = useState<string>(
     amount.toString()
   );
@@ -54,7 +56,8 @@ const SinglePotionIngredient = ({
       <div className="table">
         <div className="row">
           <Image
-            alt="ingredient"
+            alt={ingredientNames(ingredientID.toString())}
+            title={ingredientNames(ingredientID.toString())}
             unoptimized
             src={imagesIngredients[ingredientID]}
             height="64"

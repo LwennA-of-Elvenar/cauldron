@@ -1,1 +1,54 @@
-{}
+{
+  "app": {
+    "title": "Hexenkessel",
+    "description": "Hexenkessel Optimierer",
+    "initialization": {
+      "title": "Initialisiere Anwendung",
+      "text": "Bitte warten während der Hexenkessel angefeuert wird..."
+    },
+    "actions": {
+      "reset": "Reset",
+      "optimize": "Trank optimieren",
+      "cancel": "Abbrechen",
+      "cancelInProgress": "Abbrechen..."
+    }
+  },
+  "effects": {
+    "1": "Münzen",
+    "2": "Vorräte",
+    "3": "Stärke Kaserne",
+    "4": "T1 Güter",
+    "5": "T2 Güter",
+    "6": "T3 Güter",
+    "7": "Stärke Trainingsgelände",
+    "8": "Portalproduction",
+    "9": "Orks",
+    "10": "Mana",
+    "11": "Stärke Söldnerlager",
+    "12": "Saat",
+    "13": "T4 Güter",
+    "14": "T5 Güter",
+    "15": "T6 Güter",
+    "16": "Leben Trainingsgelände",
+    "17": "Leben Söldnerlager",
+    "18": "Unurium",
+    "19": "T7 Güter",
+    "20": "T8 Güter",
+    "21": "T9 Güter",
+    "22": "Leben Kaserne"
+  },
+  "ingredients": {
+    "1": "Feuerspore",
+    "2": "Käfernuss",
+    "3": "Schneckengehäuse",
+    "4": "Fliegende Iris",
+    "5": "Ei der Medusa",
+    "6": "Maden-Limette",
+    "7": "Nachtschattenblüte",
+    "8": "Spottzungen",
+    "9": "Augensprossen",
+    "10": "Bitterhaarblatt",
+    "11": "Wolkenwolle-Knospe",
+    "12": "Ohrentrüffel"
+  }
+}

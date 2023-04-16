@@ -8,13 +8,11 @@
     },
     "actions": {
       "reset": "Reset",
-      "calculateEffects": "Calculate Effects",
       "optimize": "Optimize Potion",
       "cancel": "Cancel",
       "cancelInProgress": "Cancelling"
     }
   },
-  "more": "Nothing",
   "effects": {
     "1": "Money",
     "2": "Supplies",
@@ -38,5 +36,19 @@
     "20": "T8 Goods",
     "21": "T9 Goods",
     "22": "Barracks Health"
+  },
+  "ingredients": {
+    "1": "Fire Spore",
+    "2": "Beetlenut",
+    "3": "Mana Shell",
+    "4": "Flying Iris",
+    "5": "Medusa Egg",
+    "6": "Caterpillar Lime",
+    "7": "Nightshade Blossom",
+    "8": "Mocking Tongues",
+    "9": "Eye Sprouts",
+    "10": "Bitterhair Leaf",
+    "11": "Cottoncloud Bud",
+    "12": "Ear Truffle"
   }
 }
