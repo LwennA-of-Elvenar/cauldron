@@ -235,6 +235,8 @@ const Potion = ({
   diamondIngredientConfig,
   setDiamondIngredientConfig,
 }: PotionProps) => {
+  const ingredientNames = useTranslations('ingredients');
+
   const rows: RowType = {};
 
   const setAmount = (ingredientID: number) => {
@@ -283,11 +285,29 @@ const Potion = ({
       0
     ) === 4;
 
+  const orderedIngredientsText = Object.entries(potion)
+    .filter(([, a]) => a > 0)
+    .sort(([, a], [, b]) => b - a)
+    .map(
+      ([ingredientID, amount]) =>
+        `${amount}x ${ingredientNames(ingredientID.toString())}`
+    )
+    .join('\n');
+
   return (
     <>
       <div>
         <h3>Potion</h3>
       </div>
+      <p>
+        Add the ingredients in the right order!{' '}
+        <span
+          className="orderInfo"
+          title={`Always add the ingredients with highest amounts first in order to get the lowest costs\n\n${orderedIngredientsText}`}
+        >
+          {'\u{1F6C8}'}
+        </span>
+      </p>
       <div className="potion">
         {Object.keys(rows).map((rowNumber, index) => (
           <PotionIngredientRow
@@ -317,6 +337,15 @@ const Potion = ({
         }
         p.error {
           color: red;
+        }
+        .orderInfo {
+          font-size: 1.2em;
+          color: darkgreen;
+          cursor: help;
+        }
+        .orderInfo:hover {
+          color: green;
+          text-shadow: 1px 1px 4px lightgreen;
         }
       `}</style>
     </>
