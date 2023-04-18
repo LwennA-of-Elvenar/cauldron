@@ -79,7 +79,10 @@ const Home = ({ db }: HomeProps) => {
   const [costLimit, setCostLimit] = useState(defaultCostLimit);
   const [potionStats, setPotionStats] = useState(defaultPotionStats);
   const [diplomas, setDiplomas] = useState(1);
-  const [desiredEffects, setDesiredEffects] = useState<DesiredEffectsType>({});
+  const [desiredEffects, setDesiredEffects] = useState<DesiredEffectsType>({
+    // choose first effect (available to everyone) as default, to suppress error message for new users
+    1: 1.0,
+  });
 
   const [recalculationCounter, setRecalculationCounter] = useState({
     potionChanges: 0,
