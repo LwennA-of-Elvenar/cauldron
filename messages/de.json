@@ -8,6 +8,7 @@
     },
     "actions": {
       "reset": "Trank wegschmeißen",
+      "mix": "Verschiedene Zutaten",
       "optimize": "Trank optimieren",
       "cancel": "Abbrechen",
       "cancelInProgress": "Abbrechen..."

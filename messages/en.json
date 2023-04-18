@@ -8,6 +8,7 @@
     },
     "actions": {
       "reset": "Dump Potion",
+      "mix": "Various Ingredients",
       "optimize": "Optimize Potion",
       "cancel": "Cancel",
       "cancelInProgress": "Cancelling"

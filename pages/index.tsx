@@ -109,6 +109,24 @@ const Home = ({ db }: HomeProps) => {
     setAndSaveStateWrapper(setStateFunc, potion, setPotionRaw, savePotion);
   };
 
+  // get a potion that tries to get an equal number of all ingredients
+  // depending on the configured cost limits for witch points and diamonds
+  const getMixedPotion = () => {
+    const amountForDiamondIngredients =
+      costLimit.diamonds < 100 ? 0 : costLimit.diamonds < 200 ? 1 : 2;
+    const amountForWitchPointIngredients = costLimit.witchPoints < 2175 ? 1 : 2;
+    return Object.fromEntries(
+      Object.entries(diamondIngredientConfig).map(
+        ([ingredientID, needsDiamonds]) => [
+          ingredientID,
+          needsDiamonds
+            ? amountForDiamondIngredients
+            : amountForWitchPointIngredients,
+        ]
+      )
+    );
+  };
+
   const clearRecalculation = () => {
     if (timer.current !== null) {
       clearTimeout(timer.current);
@@ -285,6 +303,15 @@ const Home = ({ db }: HomeProps) => {
               }}
             >
               {t('actions.reset')}
+            </button>
+            <button
+              type="button"
+              disabled={!editable}
+              onClick={() => {
+                setPotion(() => getMixedPotion());
+              }}
+            >
+              {t('actions.mix')}
             </button>
             <br />
             <button
