@@ -28,7 +28,7 @@
   },
   "desiredEffects": {
     "title": "Desired Effects",
-    "errorNoEffectChosen": "You need to choose at least one desired effect."
+    "errorNoEffectChosen": "You need to choose at least one desired effect by moving the corresponing slider to the right."
   },
   "diplomas": {
     "title": "Research Diplomas",
@@ -38,7 +38,7 @@
     "title": "Potion",
     "infoOrder": "Add the ingredients in the right order!",
     "detailsOrder": "Always add the ingredients with highest amounts first in order to get the lowest costs",
-    "errorFourDiamondIngredients": "Please select exactly 4 ingredients that need diamonds.",
+    "errorFourDiamondIngredients": "Please select exactly 4 ingredients that need diamonds by clicking on the <icons></icons> icons in the top right corner of the ingredient jar.",
     "errorMaxIngredients": "You cannot use more than 25 ingredients in one potion."
   },
   "potionStats": {

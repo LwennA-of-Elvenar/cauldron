@@ -9,6 +9,7 @@ import {
 import { EngineStateType } from '@/pages';
 import { PotionType } from '@/components/potion';
 import { PotionStatsType } from '@/components/potion_stats';
+import { ErrorLevel } from '@/components/message_banner';
 
 export enum Operation {
   Idle,
@@ -27,28 +28,36 @@ const startOperation = (engineState: EngineStateType) => {
   engineState.currentOperation.current = engineState.scheduledOperation.current;
   engineState.scheduledOperation.current = Operation.Idle;
   if (engineState.currentOperation.current == Operation.OptimizePotion) {
-    engineState.setWarning(engineState.t('calculation.running'));
+    engineState.setWarning(
+      'calculation',
+      ErrorLevel.Warning,
+      engineState.t('calculation.running')
+    );
   }
 };
 
 const finishOperation = (engineState: EngineStateType) => {
   engineState.setCancelling(false);
   engineState.currentOperation.current = Operation.Idle;
-  engineState.setWarning(null);
+  engineState.setWarning('calculation', ErrorLevel.Warning, null);
   engineState.runScheduler();
 };
 
 const cancelOperation = (engineState: EngineStateType) => {
   engineState.setCancelling(false);
   engineState.currentOperation.current = Operation.Idle;
-  engineState.setWarning(engineState.t('calculation.cancelled'));
+  engineState.setWarning(
+    'calculation',
+    ErrorLevel.Warning,
+    engineState.t('calculation.cancelled')
+  );
   engineState.runScheduler();
 };
 
 const failOperation = (engineState: EngineStateType, message: string) => {
   engineState.setCancelling(false);
   engineState.currentOperation.current = Operation.Idle;
-  engineState.setWarning(message);
+  engineState.setWarning('calculation', ErrorLevel.Error, message);
   engineState.runScheduler();
 };
 

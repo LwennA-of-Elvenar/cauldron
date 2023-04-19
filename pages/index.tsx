@@ -1,3 +1,4 @@
+import { GetStaticPropsContext } from 'next';
 import Head from 'next/head';
 import {
   useEffect,
@@ -6,6 +7,7 @@ import {
   SetStateAction,
   Dispatch,
   MutableRefObject,
+  ReactNode,
 } from 'react';
 import { useTranslations } from 'next-intl';
 import { DBType } from './_app';
@@ -29,10 +31,18 @@ import {
   setAndSaveStateWrapper,
   savePotion,
 } from '@/engine/cookie';
-import { GetStaticPropsContext } from 'next';
+
+import MessageBanner, {
+  ErrorLevel,
+  MessageType,
+} from '@/components/message_banner';
 
 type HomeProps = {
   db: DBType;
+};
+
+type GlobalWarningsType = {
+  [scope: string]: MessageType | null;
 };
 
 export type EngineStateType = {
@@ -43,7 +53,11 @@ export type EngineStateType = {
   cancelFlag: MutableRefObject<boolean>;
   setCancelling: Dispatch<SetStateAction<boolean>>;
   markRecalculationComplete: () => void;
-  setWarning: Dispatch<SetStateAction<null | string>>;
+  setWarning: (
+    scope: string,
+    level: ErrorLevel,
+    message: ReactNode | null
+  ) => void;
   diamondIngredientConfig: DiamondIngredientConfigType;
   potion: PotionType;
   setPotion: Dispatch<SetStateAction<PotionType>>;
@@ -98,7 +112,7 @@ const Home = ({ db }: HomeProps) => {
     useRef(null);
 
   const [cookiesLoaded, setCookiesLoaded] = useState(false);
-  const [warning, setWarning] = useState<null | string>(null);
+  const [globalWarning, setGlobalWarning] = useState<GlobalWarningsType>({});
   const [cancelling, setCancelling] = useState(false);
   const cancelFlag = useRef(cancelling);
   cancelFlag.current = cancelling;
@@ -110,6 +124,24 @@ const Home = ({ db }: HomeProps) => {
 
   const setPotion = (setStateFunc: SetStateAction<PotionType>) => {
     setAndSaveStateWrapper(setStateFunc, potion, setPotionRaw, savePotion);
+  };
+
+  const setWarning = (
+    scope: string,
+    level: ErrorLevel,
+    message: ReactNode | null
+  ) => {
+    setGlobalWarning(warnings => {
+      return {
+        ...warnings,
+        [scope]: message
+          ? {
+              message,
+              level,
+            }
+          : null,
+      };
+    });
   };
 
   // get a potion that tries to get an equal number of all ingredients
@@ -270,91 +302,98 @@ const Home = ({ db }: HomeProps) => {
           <p>{t('initialization.text')}</p>
         </div>
       ) : (
-        <main>
-          <div className="col">
-            <CostLimits
-              editable={editable}
-              effectiveCostLimits={costLimit}
-              setEffectiveCostLimits={setCostLimit}
-            />
-            <Diplomas
-              editable={editable}
-              diplomas={diplomas}
-              setDiplomas={setDiplomas}
-            />
-            <DesiredEffects
-              editable={editable}
-              cookiesLoaded={cookiesLoaded}
-              diplomas={diplomas}
-              desiredEffects={desiredEffects}
-              setDesiredEffects={setDesiredEffects}
-            />
-          </div>
-          <div className="col">
-            <Potion
-              editable={editable}
-              potion={potion}
-              setPotion={setPotion}
-              diamondIngredientConfig={diamondIngredientConfig}
-              setDiamondIngredientConfig={setDiamondIngredientConfig}
-            />
-            <button
-              type="button"
-              disabled={!editable}
-              onClick={() => {
-                setPotion(() => defaultPotion);
-              }}
-            >
-              {t('actions.reset')}
-            </button>
-            <button
-              type="button"
-              disabled={!editable}
-              onClick={() => {
-                setPotion(() => getMixedPotion());
-              }}
-            >
-              {t('actions.mix')}
-            </button>
-            <br />
-            <button
-              type="button"
-              hidden={!editable}
-              onClick={() => {
-                scheduledOperation.current = Operation.OptimizePotion;
-                runScheduler();
-              }}
-            >
-              {t('actions.optimize')}
-            </button>
-            <button
-              type="button"
-              hidden={currentOperation.current != Operation.OptimizePotion}
-              disabled={
-                currentOperation.current != Operation.OptimizePotion ||
-                cancelling
-              }
-              onClick={() => setCancelling(true)}
-            >
-              {cancelling ? t('actions.cancelInProgress') : t('actions.cancel')}
-            </button>
-            {warning && <p className="warn">{warning}</p>}
-            <PotionStats
-              potionStats={potionStats}
-              hasValidIngredients={
-                getTotalIngredients(potion) > 0 &&
-                getTotalIngredients(potion) <= 25
-              }
-            />
-          </div>
-        </main>
+        <>
+          <main>
+            <div className="col">
+              <CostLimits
+                editable={editable}
+                effectiveCostLimits={costLimit}
+                setEffectiveCostLimits={setCostLimit}
+              />
+              <Diplomas
+                editable={editable}
+                diplomas={diplomas}
+                setDiplomas={setDiplomas}
+              />
+              <DesiredEffects
+                editable={editable}
+                cookiesLoaded={cookiesLoaded}
+                diplomas={diplomas}
+                desiredEffects={desiredEffects}
+                setDesiredEffects={setDesiredEffects}
+                setMessage={setWarning}
+              />
+            </div>
+            <div className="col">
+              <Potion
+                editable={editable}
+                potion={potion}
+                setPotion={setPotion}
+                diamondIngredientConfig={diamondIngredientConfig}
+                setDiamondIngredientConfig={setDiamondIngredientConfig}
+                setMessage={setWarning}
+              />
+              <button
+                type="button"
+                disabled={!editable}
+                onClick={() => {
+                  setPotion(() => defaultPotion);
+                }}
+              >
+                {t('actions.reset')}
+              </button>
+              <button
+                type="button"
+                disabled={!editable}
+                onClick={() => {
+                  setPotion(() => getMixedPotion());
+                }}
+              >
+                {t('actions.mix')}
+              </button>
+              <br />
+              <button
+                type="button"
+                hidden={!editable}
+                onClick={() => {
+                  scheduledOperation.current = Operation.OptimizePotion;
+                  runScheduler();
+                }}
+              >
+                {t('actions.optimize')}
+              </button>
+              <button
+                type="button"
+                hidden={currentOperation.current != Operation.OptimizePotion}
+                disabled={
+                  currentOperation.current != Operation.OptimizePotion ||
+                  cancelling
+                }
+                onClick={() => setCancelling(true)}
+              >
+                {cancelling
+                  ? t('actions.cancelInProgress')
+                  : t('actions.cancel')}
+              </button>
+              <PotionStats
+                potionStats={potionStats}
+                hasValidIngredients={
+                  getTotalIngredients(potion) > 0 &&
+                  getTotalIngredients(potion) <= 25
+                }
+              />
+            </div>
+          </main>
+          <MessageBanner
+            messageList={Object.values(globalWarning).filter(
+              (warning): warning is MessageType => warning != null
+            )}
+          />
+        </>
       )}
       <style jsx>{`
         main {
           display: table-row;
-        }
-        p.warn {
-          color: orange;
         }
         div.col {
           display: table-cell;

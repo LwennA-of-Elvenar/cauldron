@@ -1,4 +1,10 @@
-import { Dispatch, SetStateAction, useState, useEffect } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import {
@@ -14,6 +20,7 @@ import {
   imagesIngredients,
   imageJar,
 } from '@/assets/assets';
+import { ErrorLevel } from '@/components/message_banner';
 
 type SinglePotionIngredientType = {
   ingredientID: number;
@@ -252,6 +259,11 @@ type PotionProps = {
   setDiamondIngredientConfig: Dispatch<
     SetStateAction<DiamondIngredientConfigType>
   >;
+  setMessage: (
+    scope: string,
+    level: ErrorLevel,
+    message: ReactNode | null
+  ) => void;
 };
 
 type RowType = {
@@ -268,6 +280,7 @@ const Potion = ({
   setPotion,
   diamondIngredientConfig,
   setDiamondIngredientConfig,
+  setMessage,
 }: PotionProps) => {
   const t = useTranslations('potion');
   const ingredientNames = useTranslations('ingredients');
@@ -320,6 +333,64 @@ const Potion = ({
       0
     ) === 4;
 
+  useEffect(() => {
+    setMessage(
+      'potion',
+      ErrorLevel.Error,
+      validPotionConfig ? null : t('errorMaxIngredients')
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validPotionConfig]);
+
+  useEffect(() => {
+    setMessage(
+      'potion',
+      ErrorLevel.Error,
+      validDiamondConfig
+        ? null
+        : t.rich('errorFourDiamondIngredients', {
+            icons: () => (
+              <>
+                <span>
+                  {' '}
+                  <Image
+                    alt="use diamonds"
+                    unoptimized
+                    src={imageUseDiamonds}
+                    height="64"
+                    width="64"
+                    style={{
+                      display: 'inline',
+                      height: '1.1em',
+                      width: 'auto',
+                      verticalAlign: 'middle',
+                    }}
+                  />
+                </span>{' '}
+                /{' '}
+                <span>
+                  {' '}
+                  <Image
+                    alt="use diamonds"
+                    unoptimized
+                    src={imageUseWitchPoints}
+                    height="64"
+                    width="64"
+                    style={{
+                      display: 'inline',
+                      height: '1.2em',
+                      width: 'auto',
+                      verticalAlign: 'middle',
+                    }}
+                  />
+                </span>
+              </>
+            ),
+          })
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validDiamondConfig]);
+
   const orderedIngredientsText = Object.entries(potion)
     .filter(([, a]) => a > 0)
     .sort(([, a], [, b]) => b - a)
@@ -352,22 +423,9 @@ const Potion = ({
           />
         ))}
       </div>
-      {validDiamondConfig || (
-        <div>
-          <p className="error">{t('errorFourDiamondIngredients')}</p>
-        </div>
-      )}
-      {validPotionConfig || (
-        <div>
-          <p className="error">{t('errorMaxIngredients')}</p>
-        </div>
-      )}
       <style jsx>{`
         div.potion {
           display: table;
-        }
-        p.error {
-          color: red;
         }
         .orderInfo {
           font-size: 1.2em;
