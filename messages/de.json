@@ -28,7 +28,7 @@
   },
   "desiredEffects": {
     "title": "Gewünschte Effekte",
-    "errorNoEffectChosen": "Mindestens ein gewünschter Effekt muss gewählt werden."
+    "errorNoEffectChosen": "Mindestens ein gewünschter Effekt muss durch Schieben des zugehörigen Reglers nach rechts gewählt werden."
   },
   "diplomas": {
     "title": "Forschungsdiplome",
@@ -38,7 +38,7 @@
     "title": "Trank",
     "infoOrder": "Füge die Zutaten in der richtigen Reihenfolge hinzu!",
     "detailsOrder": "Lege immer die Zutat mit der höchsten Anzahl als erstes in den Kessel um die geringsten Kosten zu erhalten",
-    "errorFourDiamondIngredients": "Es müssen genau 4 Zutaten markiert werden, die Diamanten benötigen.",
+    "errorFourDiamondIngredients": "Es müssen genau 4 Zutaten markiert werden, die Diamanten benötigen. Mit einem Klick auf die <icons></icons> Icons in der oberen rechten Ecke der Zutatengefäße kann dies umgeschaltet werden.",
     "errorMaxIngredients": "Ein Trank kann nicht aus mehr als 25 Zutaten bestehen."
   },
   "potionStats": {

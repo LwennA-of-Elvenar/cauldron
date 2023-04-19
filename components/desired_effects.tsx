@@ -1,7 +1,8 @@
-import { Dispatch, SetStateAction, useEffect } from 'react';
+import { Dispatch, ReactNode, SetStateAction, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { saveDesiredEffects, setAndSaveStateWrapper } from '@/engine/cookie';
 import { EffectText, EffectImage } from '@/components/effect';
+import { ErrorLevel } from '@/components/message_banner';
 
 type DesiredEffectProps = {
   editable: boolean;
@@ -67,6 +68,11 @@ type DesiredEffectsProps = {
   diplomas: number;
   desiredEffects: DesiredEffectsType;
   setDesiredEffects: Dispatch<SetStateAction<DesiredEffectsType>>;
+  setMessage: (
+    scope: string,
+    level: ErrorLevel,
+    message: ReactNode | null
+  ) => void;
 };
 
 const DesiredEffects = ({
@@ -75,6 +81,7 @@ const DesiredEffects = ({
   diplomas,
   desiredEffects,
   setDesiredEffects,
+  setMessage,
 }: DesiredEffectsProps) => {
   const t = useTranslations('desiredEffects');
   const effectiveDesiredEffects = [];
@@ -124,6 +131,15 @@ const DesiredEffects = ({
   const validConfig =
     effectiveDesiredEffects.reduce((prev, curr) => prev + curr.weight, 0) > 0;
 
+  useEffect(() => {
+    setMessage(
+      'desiredEffects',
+      ErrorLevel.Error,
+      validConfig ? null : t('errorNoEffectChosen')
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validConfig]);
+
   return (
     <>
       <div>
@@ -138,16 +154,6 @@ const DesiredEffects = ({
           />
         ))}
       </div>
-      {validConfig || (
-        <div>
-          <p className="error">{t('errorNoEffectChosen')}</p>
-        </div>
-      )}
-      <style jsx>{`
-        p.error {
-          color: red;
-        }
-      `}</style>
     </>
   );
 };

@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { NextIntlProvider } from 'next-intl';
 import type { AppProps } from 'next/app';
+import { Roboto } from 'next/font/google';
 import '@/styles/globals.css';
+
+const font = Roboto({ subsets: ['latin'], weight: '400' });
 
 export type DBType = {
   loaded: boolean;
@@ -45,6 +48,11 @@ const App = ({ Component, pageProps }: AppProps) => {
   if (error) return <pre>{error.toString()}</pre>;
   return (
     <NextIntlProvider messages={pageProps.messages}>
+      <style jsx global>{`
+        html {
+          font-family: ${font.style.fontFamily};
+        }
+      `}</style>
       <Component
         {...pageProps}
         db={{
